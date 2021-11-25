@@ -59,7 +59,7 @@ xmlns="http://java.sun.com/xml/ns/j2ee"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
 http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
-
+```html
     <filter>
         <filter-name>sitemesh</filter-name>
         <filter-class>
@@ -73,7 +73,7 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
     </filter-mapping>
 
         </web-app>
-
+```
 위 코드는 `/`로 들어오는 모든 요청에 대해서 PageFilter를 적용한다고 설정하였다. PageFilter는 요청 URL과 매칭되는 데코레이터를 검색한 뒤, 데코레이터가 발견될 경우 결과 hTML에 매칭되는
 데코레이터를 적용한다. 따라서, 데코레이터가 적용되어야 하는 URL의 경우 반드시 PageFilter에 매핑 시켜줘야 한다.
 
@@ -84,7 +84,7 @@ web.xml 파일에 PageFilter 매핑을 설정한 다음에는, 실제 데코레�
 
 decorators.xml파일은 다음과 같은 형태로 데코레이터 목록을 기술한다.
 
-```
+```html
 <decorator defaultdor="/decorator">
   <decorator name="submenu" page="submenu_decorator.jsp">
   <pattern>/sub/*<.pattern>
@@ -108,7 +108,7 @@ decorators.xml파일은 다음과 같은 형태로 데코레이터 목록을 기
 
 만약 정확하게 일치하는 `<pattern>`값이 존재할 경우 해당 데코레이터를 사용한다. 예를 들어, 아래의 설정을 보자.
 
-```
+```html
 <decoraotr name="submenu" page="submenu_decorator.jsp">
   <pattern>/sub/*</pattern>
 </decorator>
@@ -126,7 +126,7 @@ decorators.xml파일은 다음과 같은 형태로 데코레이터 목록을 기
 
 서블릿 매핑을 사용할 경우 `<pattern>` 값은 서블릿의 경로를 따른다. 예를 들어, 다음과 같이 서블릿매핑을 설정했다고 하면
 
-```
+```html
 <sevlet-mapping>
   <servlet-name> content</servlet-name>
   <url-pattern>/catalog/*</url-pattern>
@@ -135,7 +135,7 @@ decorators.xml파일은 다음과 같은 형태로 데코레이터 목록을 기
 
 이 경우 ,지정한 서블리 매핑에 해당되는 요청에 데코레이터를 적용하고자 한다면, 다음과 같이 `decorator.xml`의 `<Pattern>`태그의 값으로 서블릿 경로명을 지정해주어야한다.
 
-```
+```html
 <decorator name ="catalog" page ="catalog_decorator.jsp">
   <pattern>/catalog</pattern>
 <decorator>
@@ -148,7 +148,7 @@ decorators.xml파일은 다음과 같은 형태로 데코레이터 목록을 기
 `SiteMesh`의 데코레이터는 `JSP`페이지로서, `SiteMesh`가 제공하는 커스텀 태그를 사용하여 결과 HTML페이지를 데코레이션하게 된다. 아래 코드는 간단하게 작성해본 SiteMesh의 데코레이터
 코드이다.
 
-```jsp
+```html
   <%@ page contentType="text/html; chaset=UTF-8" %>
   <%@ taglib prefix="decorator" uri="http://www.opensymphony.com/sitemesh/decorator" %>
   <html>
@@ -178,7 +178,7 @@ HTML의 <head>태그의 내용을 삽입한다.
 `<body>`태그의 내용을 삽입한다.  
 `<body>`태그에 명시된 프로퍼티의 값을 데코레이터 JSP에 삽입하고 싶다면 다음과 같이 `<decorator:getProperty>` 커스텀 태그를 사용하면 된다.
 
-```
+```HTmL
   <body onload="<decorator:getProperty property="body.onload"/>">
 ...
   <decorator:body/>
