@@ -51,15 +51,15 @@ SitemMesh로 웨 페이지에에 레이아웃을 적용하려고한다면 두가
 - 데코레이터
 
 ##### SiteMesh 설정 1. WEB.XML
-
-        <?xml version="1.0" encoding="UTF-8"?>
+```html
+<?xml version="1.0" encoding="UTF-8"?>
 
 <web-app id="WebApp_ID" version="2.4"
 xmlns="http://java.sun.com/xml/ns/j2ee"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
 http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
-```html
+
     <filter>
         <filter-name>sitemesh</filter-name>
         <filter-class>
