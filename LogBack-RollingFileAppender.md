@@ -269,4 +269,4 @@ public interface TriggeringPolicy<E> extends LifeCycle {
 
 ```
 
-위의 설정 파일은 `SizeBasedTriggeringPolicy`를 사용하였으며 활성 로그 파일의 크기가 ***5MB이상 파일***이 되었을 때 `rollover`를 `trigger`합니다.
+위의 설정 파일은 `SizeBasedTriggeringPolicy`를 사용하였으며 활성 로그 파일의 크기가 ***5MB 이상 파일***이 되었을 때 `rollover`를 `trigger`합니다.
