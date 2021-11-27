@@ -1,4 +1,4 @@
-#LogBack Architecture
+# LogBack Architecture
 
 
 `Logback` 아키텍쳐는 `Generic` 하기 때문에 다양한 상황에서 이용될 수 있다.  
@@ -16,7 +16,7 @@
 
 `logback-access`는 `Servlet Container`와 통합되어 `HTTP엑세스`에 대한 로깅 기능을 제공한다.
 
-##logback-classic
+## logback-classic
 
 ---
 `Logback`은 `Logger`, `Appender`, `Layout` 이 세가지의 기본 클래스로 구성되어 있다.  
@@ -25,7 +25,7 @@
 `Logger`클래스는 `logback-classic` 모듈에 속하고, `Appender`와 `Layout`인터페이스는 `logback-core`모듈에 속하기 때문에,
 `logback-core`에는 `looger`의 개념이 없다.
 
-##Logger context
+## Logger context
 
 ----
 `System.out.println`을 통한 출력에 비해 `Logger` API가 갖는 가장 큰 장점은 환경이나 사용에 따라 특정 메시지를 비활성화시킬 수 있다는 점이다.  

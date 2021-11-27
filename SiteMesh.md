@@ -1,14 +1,14 @@
-# `SiteMesh`
+# SiteMesh
 
-## `SiteMesh` 란?
+## SiteMesh 란?
 
 - 웹페이지를 구성하는 레이아웃을 효율적으로 만들 수 있게 도와주는 프레임워크이다.  
   보통 웹페이지들은 `top`,`left menu`, `contents`, `right menu`, `footer` 등으로 구성되어서 메뉴 이동시에도 그 구성을 유지한채로 `Contents`만 바뀌는 형태가 대부분인데 모든 페이지를
   중복으로 구성하게 되면 매우 비효율적이고 관리도 하기 힘들기 때문에 <b>공통된 부분들을 한 곳에 집중 해서 처리하고 변경되는 부분만 변경될 수 있도록 해주는 프레임 워크이다 .</b>
 
-### `SiteMesh`를 이용하여 웹 페이지의 레이아웃을 처리하는 방법
+### SiteMesh를 이용하여 웹 페이지의 레이아웃을 처리하는 방법
 
-#### `SiteMesh`의 동작 방식과 설치
+#### SiteMesh의 동작 방식과 설치
 
 - 웹 어플리케이션을 구성하고 있는 웹 페이지들은 대부분은 페이지 레이아웃이 동일하게 구성되어 있다. 예를 들어, 미디어의 다음의 스포츠 게시판을 보면 아래와 같다.  
   ![img.png](img.png)
@@ -24,7 +24,7 @@
 뒤 `Decorator` 패턴을 사용하여 HTML 페이지에 레이아웃을 입히는 방식이다. 본 글에서는 `SiteMesh`의 동작방식에 대해서 살펴보고, `SiteMesh`를 사용하여 여러 웹 페이지에 레이아웃을 동일하게
 적용하는 방법을 확인할 수 있따.
 
-#### `SiteMesh`의 동작 방식
+#### SiteMesh의 동작 방식
 
 ``SiteMesh``는 `Tiles`와 같은 프레임워크와 달리 완전한 `HTMl` 코드로부터 레이아웃이 적용된 새로운 HTML코드를 생성해낸다. 아래 그림은 ``SiteMesh``의 동작방식을 설명한 것 이다.
 
@@ -38,19 +38,19 @@
 `Welcome.jsp`가 생성한 HTML페이지는 데코레이터에 전달된다. 데코레이터는 `welcome.jsp`가 생성한 내용으로부터 메타 정보와 `BODY` 부분을 추출한 뒤 데코레이터의 알맞은 위치에 삽입하여 최종결과를
 생성한다.
 
-#### `SiteMesh` 설치
+#### SiteMesh 설치
 
 ``SiteMesh``는 서블릿 환경에서 동작하며, `http://www.opensymphony.com/`SiteMesh`/download.action` 사이트에서 최신 버젼을 다운로드 받을 수 있다.
 `stieMesh-2.3.jar`등의 파일을 다운 받아서, 웹 어플리케이션 콘텍스트의 `WEB-INF/lib` 디렉토리에 복사하면 설치가 완료된다.
 
-##### `SiteMesh`를 이용한 레이아웃 적용
+##### SiteMesh를 이용한 레이아웃 적용
 
 `SitemMesh`로 위 페이지에 레이아웃을 적용하려고한다면 두가지가 필요하다.
 
 - ``SiteMesh`` 설정 파일
 - 데코레이터
 
-##### `SiteMesh` 설정 1. WEB.XML
+##### SiteMesh 설정 1. WEB.XML
 ```html
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -77,7 +77,7 @@ http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 위 코드는 `/`로 들어오는 모든 요청에 대해서 `PageFilter`를 적용한다고 설정하였다. `PageFilter`는 요청 `URL`과 매칭되는 데코레이터를 검색한 뒤, 데코레이터가 발견될 경우 결과 `HTML`에 매칭되는
 데코레이터를 적용한다. 따라서, 데코레이터가 적용되어야 하는 `URL`의 경우 반드시 `PageFilter`에 매핑 시켜줘야 한다.
 
-#### `SiteMesh` 설정 2 decorators.xml 작성
+#### SiteMesh 설정 2 decorators.xml 작성
 
 `web.xml` 파일에 `PageFilter` 매핑을 설정한 다음에는, 실제 데코레이터에 대한 정보를 담고 있는 `decorator.xml` 파일을 작성해주어야 한다. `decorators.xml` 파일은 데코레이터에 대한 설정
 정보를 담게 된다.
@@ -223,8 +223,8 @@ HTML의 <head>태그의 내용을 삽입한다.
 ```html
 <body bgcolor="white" onload="document.someform.somefield.focus();">
 ```
-###테스트 코드 
-####데코레이션 될 JSP코드
+### 테스트 코드 
+#### 데코레이션 될 JSP코드
 간단하게 ``SiteMesh``의 데코레이터를 통해 레이아웃이 적용될 HTML 페이지를 생성하는 JSP페이지를 다음과 같이 작성해보자, 이 `JSP`의 경로는 `/sub/submain1.jsp`라고 하자.
 
 ```HTML
@@ -275,7 +275,7 @@ HTML의 <head>태그의 내용을 삽입한다.
   </decorator>
 </decorators>
 ```
-####테스트 결과
+#### 테스트 결과
 이제 웹 브라우저에서 실제로 출력 결과를 확인해보면, 웹브라우저에서 `http://.../[contextPath]/sub/submain1.jsp를 입력한 뒤, 출력된 결과의 소스 코드는 다음과 같을 것이다.
 
 ```html

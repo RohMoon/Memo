@@ -1,15 +1,15 @@
-#LogBack Intro
+# LogBack Intro
 
 ## LogBack 이란?
 
 ---
 - `Logback`은 Java 커뮤니티에서 가장 널리 사용되는 로깅 프레임워크이다.
 - `Log4j`의 설립자 Ceki Gulcu에 의해 디자인이 되었기 때문에 `Log4j`를 계승한다. 빠르게 구현할 수 있는 것이 특징이다.
-- 많은 구성 옵션을 제공하기 때문에 Log파일보다 유연하게 아카이빙 가능하다.
+- 많은 구성 옵션을 제공하기 때문에 Log파일보다 유연하
+  ---게 아카이빙 가능하다.
 
-##LogBack 시작
+## LogBack 시작
 
----
 - `Logback` 사용을 위한 몇 가지 준비 사항
   - `maven dependency` 에 `logback-core`와 `SLF4J-api` 추가 한다.    
     `Logback`은 기본 인터페이스로써 `SLF4J(Simple Logging Facade for Java)`를 사용한다.  

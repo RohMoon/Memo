@@ -1,4 +1,4 @@
-##RollingFileAppender
+## RollingFileAppender
 
 `RollingFileAppender`는 특정 크기 제한에 도달하거나 날짜 / 시간 패턴이 더 이상 적용되지 않으면 로그 파일을 롤오버하는 파일 첨부 프로그램입니다.  
 
@@ -6,12 +6,12 @@
 
 `RollingFileAppender`는 `FileAppender`를 상속하여 로그파일을 `Rollover`한다.  
 
-###여기서 RollOVer란?  
+### 여기서 RollOVer란?  
 타깃 파일을 바꾸는 것으로 이해할 수 있다.  
 예를 들어서 RollingFileAppender가 타깃 파일로 log.txt에
 로그 메시지를 append 하다가 어느 지정한 조건에 다다르면 타깃 파일을 다른 파일로 바꿀 수 있습니다.
 
-###RollingFileAppender와 함께 동작하는 두가지 Component가 존재합니다.
+### RollingFileAppender와 함께 동작하는 두가지 Component가 존재합니다.
 1. 첫번째는 `RollingPolicy`로 `rollover`에 필요한 action을 정의한다. = > 어떤 동작을 해줄까?
 2. 두번째는 `TriggeringPolicy`로 어느 시점에 `rollover`가 발생할지 정의 한다. = > 언제 어떨때 해줄까?
 
@@ -37,7 +37,7 @@
    |                      |                          |1. 파일 압출 불가능
    |                      |                          |2. file 프로퍼티는 설정되지 않아야한다.
 
-##Rolling Policies
+## Rolling Policies
 `RollingPolicy`는 파일 `move와 renaming을 포함한 rollover 절차를 담당합니다.  
 => RollingPolicy가 What을 담당하기 때문에.
 
@@ -61,7 +61,7 @@ public interface RollingPolicy extends LifeCycle {
 - `getCompressionMode` 메서드를 통해 RollingPolicy의 압축 모드를 확인할 수 있습니다.
 - `setParent` 메서드를 통해 부모(`FileAppender`)에 대한 참조가 가능합니다.
 
-##TimeBasedRollingPolicy
+## TimeBasedRollingPolicy
 
 `TimeBasedRollingPolicy는` 가장 잘 알려진 `RollingPolicy` 종류 중 하나입니다.
 
@@ -137,7 +137,7 @@ false로 지정되면 삭제하지 않고 시작됩니다.
 아카이브 되는 파일의 개수는 30개이며, 아카이브 된 파일의 크기는 총 3GB를 넘을 수 없습니다.  
 이 조건을 만족하지 못하면 아카이브 된 로그 파일 중 가장 오래된 파일을 삭제 합니다.
 
-##SizeAndTimeBasedRollingPolicy
+## SizeAndTimeBasedRollingPolicy
 
 `SizeAndTimeBasedRollingPolicy` 는 파일의 크기까지 고려한 `TimeBasedPolicy를 상속한 `RollingPolicy`이다.  
 이전 `timeBasedPolicy` 속성 중에 `totalSizeCap`을 이용하면 전체 아카이브 된 로그 파일의 크기를 제한할 있습니다. 하지만 이 `Policy`는 각각의 로그 파일에 대한 크기를 제한 합니다.
@@ -171,7 +171,7 @@ false로 지정되면 삭제하지 않고 시작됩니다.
 활성화된 로그 파일의 크기가 `maxFileSize`에 다다르면 해당 로그파일을 아카이브 하며, 이때 `%i`토큰이 `index`로 작용하여 다음 로그 파일의 이름을 결정합니다.  
 나머지 속성들은 `TimeBasedRollingPolicy`와 동일합니다.
 
-##FixedWindowRollingPolicy
+## FixedWindowRollingPolicy
 
 `FixedWindowRollingPolicy`는 `Fixed Window` 알고리즘에 따라 로그 파일의 이름을 지정합니다.
 `fileNamePattern`은 파일의 이름 패턴을 지정하며 반드시 `%i` 토큰이 필요합니다.
