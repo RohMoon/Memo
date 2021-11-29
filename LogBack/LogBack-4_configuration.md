@@ -5,7 +5,11 @@
 ---
 Logback은 코드를 재 컴파일 하지 않고도 logging에 대하여 재구성할 수 있다.  
 Logback의 configuration 파일은 매우 유연한 문법을 갖고 있다.
+
+
 ![img_1.png](img_1.png)
+
+
 기본적인 구조는 위의 사진과 같다. `configuration`태그는 내부에 최대 1개의 root 태그를 갖고, 0개 이상의 `appender` 와 `logger`태그를 가질 수 있다.  
 태그 명명 규칙은 조금 복잡하지만 일반적으로 대소문자를 구분하며 camelCase를 따르도록 한다.
 
