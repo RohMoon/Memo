@@ -316,3 +316,254 @@ CSS는 상속을 제어하기 위한 4 가지 특수 범용 속성 값을 제공
 상속값 (inherit) 존재 X 경우, 초기값 (initial) 적용.
 - all 단축속성에 포함한 모든 속성에 사용 가능. 
 - 버젼 : CSS3 ( IE제외한 주요 최신 브라우저 모두 지원)
+
+
+#### 상속 예제
+```html
+<head>
+    <style>
+        body {
+            color: green;
+        }
+        .my-class-1 a{
+            color: inherit;
+        }
+        .my-class-2 a{
+            color: initial;
+        }
+        .my-class-3 a{
+            color: unset;
+        }
+    </style>
+</head>
+
+<ul>
+    <li>Default <a href="#">link</a> color</li>
+    <li class="my-class-1">Inherit the <a href="#">link</a>color</li>
+    <li class="my-class-2">Reset the <a href="#">link</a>color</li>
+    <li class="my-class-1">Unset the <a href="#">link</a>color</li>
+    
+</ul>
+```  
+  
+#### 모든 속성 값 재설정
+
+CSS 속기 속성을 `all`로 사용하면 이러한 상속 값 중 하나를 (거의) 모든 속성에 한 번에 적용할 수 있습니다.  
+이 값은 상속 값 (`inherit`,`initial`,`unset` 또는 `revert`) 중 하나일 수 있습니다. 스타일에 대한 변경 사항을 취소하여 새로운 변경을 시작하기 전에 알려진 시작 지점으로 돌아갈 수 있는 편리한 방법이다.
+```html
+<head>
+    <style>
+        blockquote {
+            background-color: red;
+            border: 2px solid green;
+        }
+        .fix-this{
+            all:unset;
+        }
+    </style>
+</head>
+<blockquote>
+    <p>This blockquote is styled</p>
+</blockquote>
+
+<blockquote class="fix-this">
+    <p>this blockquoute is not styled</p>
+</blockquote>
+```
+![img_3.png](img_3.png)  
+  
+### 계단식 이해하기 (Cascade)
+요소에 CSS할당하거나 class를 만들지 여부, 이제 여러 요소를 스타일링 할 수 있는 경우,  
+CSS에서 적용할 CSS 규칙을 어떻게 정의하는지 계단식(cascade)에 대한 설명
+
+1. Importance
+2. 우선 순위
+3. 소스 순서
+
+브라우저가 CSS를 정확히 적용하는 방법을 어떻게 파악하는지 아래부터 위로 살펴보자.
+
+#### 소스 순서
+
+정학히 동일한 가중치를 갖는 규칙이 두 개 이상인 경우, CSS 에서 마지막에 오는 규칙이 우선이다.  
+요소 들중에서 마지막 요소가 우선이고 요소를 스타일링 할 때까지 초기 요소를 덮어 쓰는 규칙에 가깝다.
+
+#### 우선 순위  
+소스 순서가 중요하다는 사실을 이해하면, 어느 시점에서 규칙이 스타일 시트에서 나중에 나오지만 이전의 충돌하는 규칙이 적용되는 상황이 발생한다. 이는 ___이전 규칙이 더 높은 우선 순위___ 를 갖기 때문이다. 보다 구체적이기 때문에, 브라우저에서 요소를 스타일해야 하는 규칙으로 선택하고 있다.  
+  
+`class` 선택자는 요소 선택자보다 가중치가 높기 때문에,  `class`에 정의된 속성이 요소에 직접 적용된 속성보다 우선시 된다.
+
+주목할 점은 ___"선택자 및 선택한 항목에 적용되는 규칙에 대해 생각하고 있지만, 덮어 쓰는 전체 규칙이 아니라 동일한 속성일 뿐이다."___ 라는것이다.  
+  
+아래 사항은 CSS에서 반복을 피하는 데 도움이 된다고 권장되는 사항들이다.  
+1. 일반적인 방법은 기본 요소의 일반 스타일을 정의한다.
+2. 다른 요소에 대한 `class`를 작성하는 것이다.  
+   (예로 아래 스타일 시트에서 h2 제목에 대한 일반 스타일을 정의한 다음, 일부 속성과 값만 변경하는 `class`를 만들었다.) 처음에 정의된 값은 모든 표제에 적응 되면, 모든 구체적인 값은 class가 있는 표제에 적용된다.
+```html
+<head>
+    <style>
+        h2 {
+            font-size: 2em;
+            color: #000;
+            font-family: Georgia,'Times New Roman',Times,Serif;
+        }
+        .small{
+            font-size :1em;
+        }
+        .bright{
+            color:rebeccapurple;
+        }
+    </style>
+</head>
+
+<h2>Heading woth no class</h2>
+<h2 class="small">Heading with class of small</h2>
+<h2 class="bright">Heading with class of bright</h2>
+```  
+
+![img_4.png](img_4.png)  
+  
+#### 브라우저가 우선 순위(specificity)를 계산하는 방법
+- `class` 선택자에 비해서 요소 선택자가 우선 순위가 낮아서 `class`가 덮어 쓸 수 있다.
+- 기본적으로 포인트 단위 가치가 다른 유형의 선택자에 부여되며 이를 합산하면 특정 선택자의 가중치가 부여되고, 다른 잠재적 일치 항목에 대해 평가 할 수 있다.
+- 선택자의 우선 순위는 4개의 다른 값 (또는 구성요소)을 사용하여 측정되며, 이는 4개의 열에서 Thousands,Hundreds,Tens 및 Ones 개의 단일 자릿수로 간주 될 수 있다.  
+  1. Thousands : 선언이 인라인 스타일인 `style` 속성 안에 있으면, 열에서 1점을 얻는다. 이러한 선언에는 선택자가 없으므로 그 우선 순위는 항상 1000이다.
+  2. Hundreds : 전체 선택자에 포함된 각 ID 선택자에 대해 이 열에서 1점을 얻는다.
+  3. Tens : 이 선택란에서 전체 선택자 내에 포함된 각 class 선택자, 속성 선택자 또는 `pseudo-class`에 대해 이 열에서 1점을 얻는다.
+  4. Ones : 이 항목에서 각 요소 선택자 또는 전체 선택자 내에 포함된 pseudo-element 에 대해 1점을 얻는다.
+
+>참고 : 범용 선택자 (*), 결합자(+,>,~,''') 및 부정 pseudo-class(:not)는 우선 순위에 영향을 미치지 않는다.  
+  
+|선택자|Thousands|Hundreds|Tens|Ones|Total specificity|
+|------|---------|---------|---------|-------|----------|
+|h1|0|0|0|1|0001|
+|h1 + p ::first-letter|0|0|0|3|0003|
+|li > a[href*="en-US] > .inline-warning|0|0|2|2|0022|
+|#identifier|0|1|0|0|0100|
+|요소의 style 속성 안에 규칙이 있는 선택자가 없다.|1|0|0|0|1000|
+
+```html
+<head>
+    <style>
+        /* specificity : 0101 */
+        #outer a {
+            background-color: red;
+        }
+        /* specificity : 0201 */
+        #outer #inner a {
+            background-color: blue;
+        }
+        /* specificity : 0104 */
+        #outer div ul li a{
+            color: yellow;
+        }
+        /* specificity : 0113 */
+        #outer div ul .nav a{
+            color:white;
+        }
+        
+        /* specificity : 0024 */
+        div div li:nth-child(2) a:hover{
+            borer : 10px solid black;
+        }
+        
+        /* specificity : 0023 */
+        div li:nth-child(2) a:hover{
+            border: 10px dashed black;
+        }
+        
+        /* specificity : 0033 */
+        div div .nav:nth-child(2) a:hover{
+            border : 10px double black;
+        }
+        
+        a {
+            display: inline-block;
+            line-height : 40px;
+            font-size : 20px;
+            text-decoration: none;
+            text-align: center;
+            width: 200px;
+            margin-bottom: 10px;
+        }
+        ul {
+            padding: 0;
+        }
+        li {
+            list-style-type: none;
+        }
+    </style>
+</head>
+
+<div id="outer" class="container">
+    <div id="inner" class="container">
+        <ul>
+            <li class="nav"><a href="#">One</a></li>
+            <li class="nav"><a href="#">Two</a></li>
+        </ul>
+    </div>
+</div>
+```
+
+위의 코드 처음 7개 규칙만 관심이 있기에 각 규칙 앞에 주석에 우선순위 값을 포함시켰다.
+- 처음 두 선택자는 링크의 배경색 스타일링을 놓고 경쟁한다.  두 번째 선택자는 추가 ID 선택자가 있기 때문에 이기고 배경색을 파란색으로 만든다. 우선 순위는 201vs  101이다.
+- 세번 째와 네번째 선택자는 링크의 텍스트 생상 스타일링을 놓고 경쟁하고있다.  
+두번째 선택자는 이기고 텍스트를 흰색으로 만든다.  
+이유는 한 개의 요소 선택자가 더 적지만, 누락된 선택자는 10배의 가치가 있는 class 선택자로 교체되기 때문이다.  
+그래서 승자의 우선 순위는 113 vs 104이다.
+- 선택자 5-7은 마우스를 가져 가면 링크의 테두리 스타일을 놓고 경쟁한다.  
+선택자 6은 23 vs 24의 우선 순위로 5점이 확실히 차이가 나고, 요소 선택자가 하나 더 적다.  
+선택자 7은 5와 6을 모두 능가한다.  
+5와 동일한 수의 자식 선택자가 있지만, 한 요소는 class 선택자로 교체된다. 따라서 우선 순위는 33 vs 23 및 24이다.
+
+ #### !important
+위의 모든 계산을 무효화는 데에 사용할 수 있는 특별한 CSS가 있지만 신중하게 사용해야한다.
+바로 `!important` 인데 이것은 특정 속성과 가치를 가장 구체적으로 만들어 계단식(cacade)의 일반적인 규칙을 무시하는데 사용된다.
+
+```html
+<head>
+    <style>
+        #winning {
+            background-color: red;
+            border: 1px solid black;
+        }
+        .better{
+            background-color: gray;
+            border: none !important;
+        }
+        p {
+            background-color: blue;
+            color: white;
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<p class="better">This is a paragraph.</p>
+<p class="better" id="winning">One selector to rule them all!</p>
+```
+1. `<p>`에 적용되어 있는
+```css
+background-color: blue;
+color: white;
+padding: 5px;
+```
+속성들이 `.better`class에 의해 순위가 밀려 표현되지 않고, `#winning`보다 class가 순위가 밀려 두번째 단락에서 밀렸지만 `!important`가 표기된 `border`속성에 관련해서는 순위가 또 후순위가 되면서 `border`에 관해서는 `.better`속성을 따르게 된다.  
+  
+`!important` 가 존재한다는 것을 아는 것이 도움이 되고 다른 개발자의 코드에서 발견했을 때 의미를 이해할 수 있다.  
+하지만 반드시 필요한 경우가 아니면 사용을 권장하지 않고 있다.  
+  
+이유는 `!important` 계단식이 정상적으로 작동하는 방식을 변경시키기 때문이고, 그로 인해 문제가 생겼을때 문제해결을 하기가 어려워질 수 있기 때문이다.  
+핵심 CSS module을 편집할 수 없는 CMS에서 작업할 때, 다른 방법으로는 재정의 할 수 없는 스타일을 재정의 하려는 경우에 사용할 수도 있다.  
+그러나 ___사용을 피할 수 있으면 피해야 한다.___ 라고 권장된다.  
+  
+### 요약
+
+---
+충돌 선언은 다음 순서로 적용되며, 이후 선언은 이전 선언보다 우선시 한다.  
+1. 사용자 에이전트 스타일 시트의 선언 (예. 다른 스타일이 설정되지 않은 경우 사용되는 브라우저의 기본 스타일).
+2. 사용자 스타일 시트의 일반 선언 (사용자가 설정한 사용자 정의 스타일).
+3. 작성자 스타일 시트의 일반적인 선언 (웹 개발자가 설정한 스타일).
+4. 작성자 스타일 목록에서 중요한 선언.
+5. 사용자 스타일 시트의 중요한 선언.  
+
+웹 개발자의 스타일 시트는 사용자 스타일 시트를 재정의 하는것이 합리적이므로 디자인을 의도한대로 유지할 수 있지만, 사용자는 위에서 언급한 것처럼 웹 개발자 스타일을 재정의 해야 할 충분한 이유가 있다.
