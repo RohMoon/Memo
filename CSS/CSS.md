@@ -27,7 +27,7 @@ P {
 }
 ```  
 
-![img_2.png](img_2.png)
+![img_2.png](../img_2.png)
 
 JS에서 처럼 선택자(`selector`)와 선언(`color :red`),속성(`color`), 속성 값(`RED`)으로 이루어진 것을 확인할 수 있다.
 
@@ -370,7 +370,7 @@ CSS 속기 속성을 `all`로 사용하면 이러한 상속 값 중 하나를 (�
     <p>this blockquoute is not styled</p>
 </blockquote>
 ```
-![img_3.png](img_3.png)  
+![img_3.png](../img_3.png)  
   
 ### 계단식 이해하기 (Cascade)
 요소에 CSS할당하거나 class를 만들지 여부, 이제 여러 요소를 스타일링 할 수 있는 경우,  
@@ -420,7 +420,7 @@ CSS에서 적용할 CSS 규칙을 어떻게 정의하는지 계단식(cascade)�
 <h2 class="bright">Heading with class of bright</h2>
 ```  
 
-![img_4.png](img_4.png)  
+![img_4.png](../img_4.png)  
   
 #### 브라우저가 우선 순위(specificity)를 계산하는 방법
 - `class` 선택자에 비해서 요소 선택자가 우선 순위가 낮아서 `class`가 덮어 쓸 수 있다.
