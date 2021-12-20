@@ -1,0 +1,27 @@
+## rootContext_servletContext
+Spring FrameWork를 사용하면서 무심코 지나치기 쉬운 `context config`에 대한 기본적인 내용이다.  
+
+Spring은 계층구조를 가지는 `multi context`환경을 구성할 수 있도록 해주며 이 spring의 `context`에 대한 설정을 크게 두가지로 나눈다면 `root context`와 `servlet context`로 볼 수 있다.  
+
+`servlet context`의 경우 `web application`의 `client`의 요청을 받기 위한 `entry point`로서 서블릿의 `context`설정이라고 볼 수 있다.  
+따라서 해당 `context`의 설정에는 요청에 대한 처리를 해줄 `controller`의 매핑설정(`handler mapping`)과 요청처리 후 `view`처리를 어떻게 할 것인가에 대한 설정 (`view resolver`)등이 존재하게 된다.  
+
+`root context`의 경우 `web application`의 실제 비지니스 혹은 목적을 위한 `service layer`와 해당 `service layer`에서 조회 및 처리에 필요한 database와 연결되는 `repository layer`를 구성하는 `bean`들에 대한 설정을 하게 된다.  
+
+위 두개의 `context`는 계층구조를 가지게 되는데 아래의 그림처럼 `servlet context`에서 `root context`에 등록된 `bean`들에 대한 참조를 가지는 구조로 형성된다.  (반대의 참조는 불가능하다.)
+![img.png](img.png)  
+  
+위 그림의 `servlet context`에 대한 설정은 `[servlet-name]-context.xml`이라는 이름의 설정 파일로 존재하게 된다.  
+다수의 `servlet1`,`servlet2`를 가지게 되는 경우 다수의 `sevlet context`가 `root context`의 `bean`정보들을 참조하는 구조가 될 수도 있습니다.  
+  
+이러한 `context`의 성격을 알고 `spring mvc`의 `context`설정을 볼 때 `context component scan`을 통한 `bean`등록 설정에 주의 해야한다.  
+
+양쪽 `context`설정에서 `component scan`을 통해 `bean`등록을 할 때 `controller`와 `service`, `repository` 각 `bean`들이 등록되어야 하는 `context`에 맞게 등록이 되도록 해주어야 합니다.  
+단순히 `basepackage`에 대한 설정만으로 스캔을 해버린다면 같은 `bean`이 양쪽 `context`에 모두 등록되게 되어 불필요한 `bean`이 등록되어진다.  
+(물론 중복 등록이 큰문제가 되지 않을 수 있겠지만 굳이 낭비를 해야하나?)  
+  
+따라서 `component scan`을 통한 각 `context`에 대한 `bean`등록시 `exclude`,`include`를 적절히 활용하여 불필요한 중복`bean`등록이 되지 않도록 해주는 것이 좋습니다. 또한, 같은 맥락에서 트랜잭션 제어를 위한 `<tx:annotation-driven.>`설정도 트랜잭션을 제어하고자 하는 해당 `bean` 이 등록된 `context`에 선언을 해주어야 하는것은 당연하다.  
+  
+  
+`spring mvc`를 사용하면서 쉽게 지나칠 수 있는 `context`에 대한 기본적인 내용을 살펴 보았다. 
+
