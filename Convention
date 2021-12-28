@@ -1,0 +1,16 @@
+1. Pascal Case
+2. camelCase
+3. kebob-Case
+4. knake_Case
+
+- 각각의 차이는 단어 사이 구분으 해주냐
+- CSS
+  - snake나 kebob
+- file에서는 snake_case
+
+CSS 방법론
+- BEM
+
+접근성
+rem = html 에 걸린 폰트사이즈 기준 
+em =  상위 
