@@ -1,0 +1,16 @@
+### @SuppressWarnings("rawtypes") 와 같은 어노테이션을 사용하는 이유는?
+
+자바에서 노란색으로 `Warnings`가 나타나는 경우 어노테이션을 이용하여 문제를 해결할 수 있다.  
+  
+@SuppressWarinings - 컴파일 경고를 무시함.  
+1. all : 모든 경고 억제
+2. cast : 캐스트 연산자 관련 경고 억제
+3. dep-ann :  사용하지 말아야 할 메소드 관련 경고 억제
+4. deprecation : 사용하지 말아야 할 메소드 관련 경고 억제
+5. fallthrough : switch문에서의 break 누락 관련 경고 억제
+6. finally : 반환하지 않는 finally 블럭 관련 경고 억제
+7. null : 분석 관련 경고 억제
+8. rawtypes : 제네릭 (데이터 형식에 의존하지 않고, 하나의 값이 여러 다른 데이터 )
+9. unchecked : 검증되지 않은 연산자 관련 경고 억제
+10. unused : 사용하지 않는 코드 관련 경고 억제
+11. incomplete-switch : switch문 case에 누락 관련 경고 제외
