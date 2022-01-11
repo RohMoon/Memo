@@ -1,0 +1,213 @@
+# JavaScript 객체 기본
+
+## 객체기본
+객체는 관련된 데이터와 함수의 집합이다. (일반적으로 여러 데이터와 함수로 이루어지는데, 객체 안에 있을때 보통 프로퍼티와 메소드라고 부른다.)
+> 객체 안에 있을 때, 데이터는 프로퍼티 / 함수는 메소드  
+
+JavaScript의 요소들과 마찬가지로 객체를 생성하는 것은 변수를 정의하고 초기화하는 것으로 시작한다.
+```javascript
+let person = {};
+```
+결과가 값이 
+```html
+[object Object]
+Object{   }
+{   }
+```
+이것이 객체를 만드는 방법이다, 하지만 빈객체이므로 실제로 많은것들을 할 수 없다.
+```javascript
+const person = {
+    name:['Bob','Smith'],
+    age:32,
+    gender: 'male',
+    interests : ['music','skiing'],
+    bio: function () {
+        alert(this.name[0] + ' '+ this.name[1] + '  ' + this.age + 'years old. he likes '+ this.interests[0] + ' and '+ this.interests[1] + '.');
+    },
+    greeting: function () {
+        alert("Hi! I'm "+ this.name[0]+ '.');
+    }
+};
+```
+실행하는 문구
+```javascript
+person.name
+person.name[0]
+person.age
+person.interests[1]
+person.bio()
+person.greeting()
+```
+이러한 객체 내부에 몇 가지 데이터와 기능이 있으며, 멋진간단한 구문으로 액세스할 수 있다.  
+이번엔 객체는 각기 다른 이름(위에서의 예에서는 `name`과 `age`)과 값(예제서,`['Bob', 'Smith']`과 `32`)을 갖는 복수개의 멤버로 구성이 된다. 한 쌍의 이름과 값은 ','으로 분리된다. 결국 문법은 아래와 같은 패턴이된다.
+```javascript
+let objectName = {
+    member1Name : member1Value,   
+    member2Name : member2Value,   
+    member3Name : member3Value   
+};
+```
+객체를 구성하는 멤버의 값은 어떤 것이라도 될 수 있다.  
+우리가 만든 `person`객체는 문자열, 수자, 배열 두개와 두개의 함수를 가지고 있다.  
+처음은 4개의 아이템은 데이터아이템인데, 이걸 객체의 ___프로퍼티(속성)___ 이라고 부른다. 끝에 두 개의 아이템은 함수인데,  
+이 함수를 통해 데이터를 가지고 뭔가 일을 할 수 있게 된다. 이걸 우리는 ___메소드___ 라고 부른다.  
+  
+이런 객체는 객레 리터럴(ojbect literal)이라고 부른다.객체를 생성할때 컨텐츠를 그대로 대입한다. 객체 리터럴은 클래스로부터 생성하는 방식과는 다르다.
+
+객체 리터럴을 사용해서 객체를 생성하는 것은 연속된 구조체나 연관된 데이터를 일정한 방법으로 변환하고자 할 때 많이 쓰이는 방법이다.  
+예를 들면 서버에게 주소를 데이터베이스에 넣어달라고 요청하는 경우이다. 각 아이템들을 하나 하나 개별 전송하는 것보다 하나의 객체를 전송하는 것이 훨씬 효율적이다.  
+또 각 아이템들을 이름으로 구분해서 사용하기 원할 때도 배열을 사용하는 것보다 훨씬 쉽다.  
+  
+## 점표기법
+위에서, 우리는 객체의 프로퍼티와 메소드를 ___점 표기법___ 을 통해 접근했다.  
+객체 이름`person`은 ___네임스페이스___ 처럼 동작한다. 객체 내에 캡슐화되어 있는 것에 접근하려면 먼저 점을 입력해야 한다.  
+그 다음 점을 찍고 접근하고자 하는 항목을 적습니다. 간단한 프로퍼티의 이름일 수도 있을 것이고, 배열의 일부이거나 객체의 메소드를 호출할 수도 있습니다. 
+```javascript
+person.age
+person.interests[1]
+person.bio()
+```
+
+### 하위 namespces
+다른 객체를 객체 멤버의 값으로도 갖는 것도 가능하다. 예를 들면, 다음과 같은 `name` 멤버를
+```javascript
+name : ['Bob', 'Smith'],
+```
+를 아래와 같이 바꿔보자 
+```javascript
+name : {
+    first : 'Bob',
+    last: 'Smith'
+},
+```
+이렇게 된다면 성공적으로 하위 namespace를 만든것이다.  
+복잡해보이지만, 사실 그렇지 않다. 이 속성을 사용하려면 그저 끝에 다른 점을 하나 찍어주기만 하면 된다.
+```javascript
+person.name.first
+person.name.last
+```
+__중요__ 객체의 속성이 바뀌었으니까, 기존 메소드 코드를 바꿔 줘야 한다. 기존 코드를 
+```javascript
+name[0]
+name[1]
+```
+에서 
+```javascript
+name.first
+name.last
+```
+
+## 괄호표기법
+객체의 프로퍼티에 접근하는 다른 방법으로는 괄호 표기법을 사용하는 것이 있다.  
+다음과 같이 사용하는 대신
+```javascript
+person.age
+person.name.first
+```
+를 아래와 같이
+```javascript
+person["age"]
+person["name"]["first"]
+```
+이런 방식은 배열 속에 항목에 접근하는 방법과 매우 유사해보이는데 실제로도 이는 기본적으로 동일하다.  
+한 항목을 선택하기 위해 인덱스 숫자를 이용하는 대신에 각 멤버의 값들과 연결된 이름을 이용한다.  
+객체가 간혹 ___연관배열(associative arrays)___ 이라고 불리는것이 당연하다. 연관 배열은 배열이 숫자를 값에 연결하는 것과 같은 방법으로 문자열을 값에 매핑한다.
+
+## 객체 멤버 설정하기
+지금까지는 객체 멤버를 단순히 가져오기만(또는 반환)했다. 설정할 멤버를 간단히 명시하여 (점이나 대괄호 표기법을 사용)객체 멤버의 값을 설정(갱신) 하는 것도 물론 가능하다.
+```javascript
+person.age = 45;
+person["name"]["last"] = "Cratchit";
+```
+위의 코드를 입력한 다음, 객체 멤버값을 아래와 같이 다시확인해보자.
+```javascript
+person.age
+person["name"]["last"]
+```
+객체 멤버를 설정하는 것은 단순히 기존에 존재하는 프로퍼티나 메소드로 값을 설정하는 것 뿐만 아니라, 완전히 새로운 멤버를 생성할 수도 있다.
+```javascript
+person['eys']= "hazel";
+person["name"]["last"]
+```
+객체 멤버를 설정하는 것은 단순히 기존에 존재하는 프로퍼티나 메소드로 값을 설정하는 것뿐만 아니라, 완전히 새로운 멤버를 생성할 수도 있다.
+```javascript
+person["eyes"] = "hazel";
+person.farewell = function (){alert("bye everybody"); }
+```
+```javascript
+person["eyes"]
+person.farwell()
+```
+
+대괄호 표현의 이점 중하나는 멤버으 ㅣ값을 동적으로 변경할 수 있을 뿐아니라, 멤버 이름까지도 동적으로 사용할 수 있다는 것이다.  
+자 만약 사용자가 두개의 텍스트 입력을 통해서 people 데이터에 커스텀 값을 넣고 싶어한다고 가정해보자, 그 값은 다음과 같이 얻어올 수 있을것이다.  
+```javascript
+let myDataName = nameInput.value;
+let myDataValue = nameValue.value;
+```
+이제 `person` 객체에 다음과 같이 새 멤버의 이름과 값을 추가할 수 있습니다.
+```javascript
+person[myDataName] = myDataValue;
+```
+제대로 동작하는지 보려면 아래와 같이 `person` 객체에 대괄호를 붙여서 확인해볼수 있다.
+```javascript
+let myDataName = "height";
+let myDataValue = "1.75m";
+person[myDataName] = myDataValue;
+```
+```javascript
+person.height
+```
+## "This"는 무엇인가?
+자, 우리가 이제 보게될 메소드가 좀 이상하게 보일 수도 있을것이다.
+```javascript
+greeting: function() {
+    alert("Hi, I'm "+ this.name.first+",");
+}
+```
+아마도 `this`가 뭔지 의아할 것이다. `this`키워드는 지금 동작하고 있는 코드를 가지고 있는 객체를 가리킨다. 위의 예제에서 `this`는 `person`객체와 동일하다.  
+그럼 직접 `person`객체를 쓰지않은걸까? 생성자를 공부하게 될 때, 혹은 그 외 상황에서 this는 유용하다. 이 this라는 녀석은 객체 멤버의 컨텍스트가 바뀌는 경우에도 언제나 정확한 값을 사용하게 해준다.
+(예를 들어 두개의 다른`person`객체가 각각 다른 이름으로 인스턴스로 생성된 상태에서 인삼라을 출력하기 위해 객체의 `name`을 참조해야 한다고 했을때)
+```javascript
+let person1 ={
+    name : "Chris",
+    greeting : function () {
+        alert("hi! I'm "+ this.name+ ".");
+    }
+}
+
+let person2 = {
+    name : "Deepti",
+    greeting : function () {
+        alert("hi! I'm "+ this.name+ ".");
+    }
+}
+```
+이 예제에서 메소드의 실제 코드는 완전히 동일하지만 `person1.greeting()`은 "hi! I'm Chris"를 출력할것이다.  
+반면, `person2.greeting()`은 "Hi! I'm Deepti."을 출력하게 된다.  
+앞서 이야기한 것처럼 `this`는 실행중인 코드가 속해있는 객체이다. 객체 리터럴을 직접 지정해서 사용하는 경우라면 그리 유용하지 않겠지만 , 동적으로 객체를 생성하는 경우 (예를 들면 생성자를 사용하는 경우)에는 매우 유용하다.  
+이 부분은 추후에 더 명확하게 이해가 될 것이다.
+### 객체를 줄곧 사용해왔다.
+다음과 같은 문자열의 메소드가 있다고 가정하자
+```javascript
+myString.split(",");
+```
+`String`클래스의 인스턴스가 가진 메소드를 사용하고 있습니다. 코드에서 문자열을 생성할 때 마다
+`String`의 인스턴스가 만등러지고, 그렇게 만들어진 인스턴스는 당연히 공통적으로 사용할 수 있는 메소드와 프로퍼티를 가진다.  
+
+아래와 같이 도큐먼트 오브젝트 모델 (DOM)에 접근할때면,
+```javascript
+let myDiv = document.createElement("div");
+let myVideo = document.querySelector("video");
+```
+`Document` 클래스의 인스턴스를 통해 메소드를 사용하고 있는 것이다. 각 웹페이지가 로딩될 때, `Document` 인스턴스가 만등러지고, 전체 웹 페이지 구조와 컨텐츠 그리고 URL 같은 기능들을 제공하는 `document`가 호출된다.  
+다시 말하지만 이건 여러 공통 메소드와 프로퍼티들이 이 인스턴스를 통해 사용하게 된다.
+우리가 계속 해왔던 다른 내장객체/API (`Array`, `Math` 등등)들도 만찬가지이다.  
+  
+모든 내장 객체/ API가 자동으로 객체의 인스턴스를 생성하는 것은 아니라는 것에 주의해야한다.  
+예를 들면 `Notifications API` 최근 브라우저들이 시스템 알림을 사용하게 하는 기능 __는 사용자가 발생 시키길 원하는 `notification`만을 선택하게 하는 생성자를 사용해야 한다. 
+```javascript
+let myNotification = new Notification("Hello");
+```
+>Note 객체간 통신은 message passing 방식을 사용한다고 생각하는게 좋습니다.  
+> 한 객체가 다른 객체에게 어떤 액션을 요청해야하는 경우, 그 객체는 다른 객체가 가지고 있는 메소드를 통해서 메시지를 보내는 것이고, 응답을 기다리는 것이다. 그 응답이 우리가 알고 있는 return 값이다.

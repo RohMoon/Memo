@@ -1,0 +1,179 @@
+# JavaScript Core -객체편
+> 'JavaScript는 기본타입을 제외한 모든 값은 객체이다.'
+
+## 데이터 타입
+자바스크립트 타입은 기본 타입과 참조 타입으로 나뉜다.
+
+### 기본타입
+ 1. 숫자
+ 2. 문자열
+ 3. 불린값(Boolean)
+ 4. undefined
+ 5. null
+
+### 참조 타입
+- 객체
+  - 배열
+    - 함수
+    - 정규표현식  
+
+기본타입으로 분류 되는 숫자, 문자열, 불린 값, undefined, null 값을 제외한 모든 값은 객체로 취급된다.
+
+### 객체 특징
+자바스크립트의 객체는 `이름(key) : 값(value)`의 형태로 `Properties`(프로퍼티들)를 저장하는 `Container`(컨테이너)이다.  
+자바스크립트 기본타입은 하나의 값만 가지는 데 비해, 참조 타입인 객체는 `여러개의 프로퍼티들을 포함`할 수 있다.  
+객체의 프로퍼티는 기본 타입의 객체를 포함하거나 다른 객체를 가리킬 수 있다.  
+객체의 프로퍼티는 `함수`로 포함 할 수 있으며 이를 `메서드`라고 칭한다.
+
+### 객체 생성
+#### Object 생성자 함수 이용
+내장 `Object()` 생성자 함수를 이용해서 객체를 생성한다.
+```javascript
+//Object() 를 이용한 빈 객체 생성
+let obj = new Object();
+//객체 프로퍼티 생성
+obj.name = '오브젝트이다.';
+obj.num = 123;
+obj.bool = true;
+
+console.log(obj.name); // 오브젝트다
+console.log(obj.num); // 123
+console.log(obj.bool); // true
+```
+
+#### 객체 리터럴 방식 이용
+리터럴이란 의미는 있는 표기법이다. {} 를 이용해 생성하게되는 방법이다. 프로퍼티 값에 함수가 있으면 `메서드`라고 부른다.
+```javascript
+let obj= {
+    name : '오브젝트다.',
+    num : 456,
+    func : function () {
+        console.log('이것은 메서드');
+    }
+}
+console.log(obj.name);//오브젝트다.
+console.log(obj.num); //456
+console.log(obj.func);// f(){console.log('이것은 메서드다');}
+```
+class문법에서의 constructor는 prototype에 붙어있는 constructor를 의미하지 않는다.
+객체.__proto__.constructor에는
+객체.constructor로 접근이 가능하다.
+해당 인스턴스를 생성한 생성자 함수를 의미한다.
+객체.__proto__ 는 Array.prototype이다.
+객체.__proto__.constructor는 Array 펑션을 뜻하고
+Array.prototype.constructor 는 어레이다.
+__proto__는 객체에 붙어있고
+해당 객체를 만들때 쓴 생성자 함수의 prototype을 의미한다.
+new Array().__proto__ 는 Array.prototye과 동일하다. __proto__로 접근하는 방법에는
+Object.getPrototypeOf라는 함수도 있따.
+Object.getPrototypeOf(new Array()) 는 Array.prototype 이다.
+모든 객체를 찍어낸 클래스는 모두 함수이고
+이 함수는 프로토타입이란걸 가지고있고 이 함수로 찍어낸 객체에는 __proto__ 로 함수(생성자)의 프로토타입을 바라보게 된다
+# JavaScript Core -함수편(표현식, 선언문, 호이스팅)
+> 함수는 JavaScript에서 기본적인 구성 `block`중의 하나이다.
+> 함수는 작업을 수행하거나 값을 계산하는문장 집합 같은 자바스크립트 절차이다. 
+> 함수를 사용하려면 함수를 호출하고자 하는 범위 내에서 함수를 정의해야하만 한다.  
+
+위 설명이 처음 접하는 초심자 입장에서는 와닿지 않을 수도 있다. 해당 설명은 프로토타입과 호이스팅 등 js의 핵심 개념을 이해하고 다시 돌아와서 보면 이해가 된다. 핵심 개념 이전에 간단히 함수에 대해 알아보고 호이스팅에 대해 알아보자.
+```javascript
+function Fish(){}
+```
+`Function`이라고 하는 함수로 생성한다. 
+이것은 `new Function()` 의 결과와 같다.
+근데 `new Function()`이라는 문법을 잘 사용안하잖아?
+그래서 리터럴하게 
+```javascript
+function Fish(){
+    
+} 
+```
+이렇게 쓴 자체로 함수 인스턴스화를 할수 있게끔한것이고 
+이 리터럴표현법 자체가 또 어떤 인스턴스를 생성해낼 수 있는 클래스가 되기도 한다.
+== 구현체 ? 
+```javascript
+let fish = new Fish();
+fish.swim();
+```
+이렇게해서 피쉬안에 메서드를 사용하고 할거잖아?
+근데 `Fish();` 라는 구현체 함수 안에 `swim`이 정의가 안되어있잖아? 
+```javascript
+function Fish() {
+    this.swim=()=>{}
+}
+let fish = new Fish();
+fish.swim();
+```
+이렇게하면 swim을 쓸 수 있게 되잖아 . 근데 이렇게 표현하면
+```javascript
+function Fish() {
+  this.swim =()=>{}
+}
+let fish = new Fish();
+let fish2 = new Fish();
+fish.swim();
+delete fish2.swim;
+fish2.swim();
+```
+
+변수명 fish 객체의 그냥 멤버변수(지역변수)처럼 되었네?  
+그러니까 이런 함수는 저렇게 멤버변수에 안 담아 => 이게 메소드인가?
+```javascript
+function Fish() {};
+Fish.prototype.swim =()=>{};
+```
+이렇게 담는다. => 멤버변수처럼 담기면 무슨 문제가?..
+```javascript
+function Fish() {};
+Fish.prototype.swim =()=>{};
+let fish = new Fish();
+let fish2 = new Fish();
+fish.swim();
+delete fish2.swim;
+fish2.swim(); //delete 했을때 멤버변수로서의 swim은 삭제가 되는 거였구나?
+```
+에서 `delete fish2.swim`은 무효가 된다.
+
+애초에 멤버변수로써 메소드가 존재하는것이 아니니까 ! 무효가 된다는거.!// 구현체로서 불변성을 보장해야한다 라는 느낌이 드는데 관련있는부분인가?
+그리고 `Fish.prototype` 이것이 `function Fish() {}`가 탄생되면서 함께 준비된다. // 함께 준비된다는 것이 안에 포함되어 있는것인가 따로 기억되는것인가?
+
+ES6에서 나온 class 문법을 통해서 구현할 때 메소드는 프로토타입에 정리가 되어 기억된다.
+
+해당 함수가 생성되어 질때 `enumerable`되지 않는 형태로 숨은형태 , 즉 숨은 ㅎ여태로 함수라고 부르는 개체의 숨은 속성으로써 `prototype`이 준비되게 된다. // 이 말은 객체안에 내포되어있다라는건가?
+
+그리고 이 함수를 통해 만들어진 객체에는 이 `prototye`이 `__prototype__` 라는 이름으로 붙게된다. 
+
+```javascript
+function Fish() {}
+Fish.prototype = HTMLElement.prototype;
+new Fish().querySelector
+```
+이런식의 표현/접근도 가능하다.단 querySelector가 정상작동하지 않는다. // 아 ?... 정상작동 안하는데 표현이 가능하다고 하시는건감.. ?
+```javascript
+class Abc{}
+function Abc2(){}
+console.log(Object.getOwnPropertyDescriptor(Abc,'prototype').writable)// false
+console.log(Object.getOwnPropertyDescriptor(Abc2,'prototype').writable)// true
+```
+이것에는 차이가 있다는 점도 알아야한다. 
+그래서 `funciton`방식의 `Abc2.prototype`은 갈아치워질수가 있다.
+
+```javascript
+class Abc{};
+Abc.prototype = HTMLElement.prototype;
+new Abc().querySelector === undefined; // true
+```
+이것은 true
+```javascript
+function Abc() {};
+Abc.prototype = HTMLElement.prototype;
+new Abc().querySelector === undefined;//false
+```
+클래스의 `prototype`은 재할당 할 수가 없다. 그래서 `Abc.prototype = HTMLElement.prototype;`했음에도 불구하고  `undefined`라는 결과가 나오고,
+펑션의 `prototype`은 재할당이 가능해서, 
+```javascript
+function Abc() {};
+new Abc().querySelector === undefined;//true
+```
+가 나오지만, `Abc.prototype = HTMLElement.prototype;` 후에는 변경되어 `false`가 반환된다.
+
+
