@@ -13,8 +13,8 @@ let person = {};
 [object Object]
 Object{   }
 {   }
-```
-이것이 객체를 만드는 방법이다, 하지만 빈객체이므로 실제로 많은것들을 할 수 없다.
+```![img.png](img.png)
+이것이 객체를 만드는 방법이다, 하지만 빈객이므로 실제로 많은것들을 할 수 없다.
 ```javascript
 const person = {
     name:['Bob','Smith'],
