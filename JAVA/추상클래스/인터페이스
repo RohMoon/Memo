@@ -15,7 +15,7 @@ abstract class 클래스이름(){
 - 추상클래스가 미완성 설계도라면 인터페이스는 ___기본 설계도___ 라고 할 수 있다. 인터페이스도 추상클래스처럼 다른 클래스를 작성하는데 도움을 주는 목적으로 작성하고 클래스와 다르게 다중상속(구현)이 가능하다.
 ```java
 interface 인터페이스이름(){
-    public static fuinmal ㅅ아수이름 = 값;
+    public static fuinmal 상수이름 = 값;
     public abstract void 메서드이름();
 }
 ```
