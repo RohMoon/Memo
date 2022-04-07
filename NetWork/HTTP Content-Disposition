@@ -1,0 +1,52 @@
+# HTTP Content-Disposition 이란
+
+- Disposition이란, 기질 ,성향, 배치, 배열 이란 뜻이다.
+- HTTP Response Header에 드렁가는 __Content-Disposition__ 은 HTTP Response Body에 오는 컨텐츠의 기질/성향을 알려주는 속성이다.  
+```http request
+Content-Disposition: attachment; filename="hello.jpg"
+```
+" 는 서버측에서 header를 설정할 때 붙이지 않아도 된다.
+
+## Multipart
+- 만약 Body에 담길 data가 커서 HTTP response가 여러번 나가야 한다면 ```multipart``` 같은 형식으로 나가게 된다.
+  1. 첫 번째 Response Header
+  ```http request
+  Content-Type : multipart/form-data; boundary="boundary"
+  ```
+  2. 두 번째 Response Header
+  ```http request
+  Content-Disposition: form-data; name="field1"
+  ```
+  3. 세 번째 Response Header
+  ```http request
+   Content-Disposition : form-data; name="field2"; filename="example.txt";
+  ```
+### 의문
+- HTTP body는 용량제한이 없어도 (브라우저나 서버에서 정한 미니멈이 사실상 제한이 될 것) HTTP를 있게 해주는 Transport Layer나 Network layer에서  
+payload 제한이 있을텐데 HTTP 단에서 패킷 순서를 받아서 한 번에 보여주는 것인가?
+- 이것에 대한 실험을 위해 1,000byte, 100,000byte, 100,000byte , 1,000,000 byte를 한 번 보내보자.
+```java
+
+@RestController
+public class MainController{
+    
+    @RequestMapping(value = "/test1", method = RequestMethod.GET)
+    public ResponseEntity<String> getTest1File(){
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 1000; i++) {
+            sb.append ("A");
+        }
+    
+    
+    HttpHeaders headers = new HttpHeaders();
+    headers.add( "Content-Disposition","attachment; filename=test1.txt" );
+    return ResponseEntity
+            .ok()
+            .headers(headers)
+            .body(sb.toString());
+    }
+}
+```
+```html
+<a href="http://localhost:8080/test1">여기!</a>
+```
