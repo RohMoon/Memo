@@ -24,7 +24,7 @@
 ```java
     public class WebConfiguration implements WebMvcConfigurer{
     
-    @OverRide
+    @override
     public void addResourceHandler(ResourceHandlerRegistry registry){
         registry.addResourceHandler("/resources/**")
                 .addResourceLocation("/resources/");
