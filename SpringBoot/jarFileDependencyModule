@@ -15,3 +15,14 @@
 - `org.springframework.boot.loader.jar.JarFile`을 이용하여, 내장 `JAR` 파일을 읽고,
 - `org.springframework.boot.loader.Launcher`를 사용하여 실행한다.<br><br>
 - 즉, 스프링부트는 <b> 독립적으로 실행가능한 어플리케이션</b>이다.
+
+- 독립적으로 실행가능한 어플리케이션이 스프링부트의 주요 목적이다.
+- pom.xml의 Spring-boot-maven-plugin이 해주는 일이 바로 패키징이다.
+jar 안에 jar 파일들을 그대로 묶어둘 수 있도록 지원 해서 하나의 jar 파일로 패키징할 수있다.
+모든 명령어는 프로젝트의 홈 디렉토리에서 실행하면 된다.
+- 아래는 대표적으로 쓰이는 명령어이다.
+- mvn clean
+- mvn package ->  실행 가능한 JAR파일 "하나가" 생성된다.
+- mvn clean package -->한번에 실행할 수도 있다.
+- mvn package- DskipTests --> test는 건너뛴다.
+- java- jar 생성된_jar_파일_이름  --> 실행한다.
