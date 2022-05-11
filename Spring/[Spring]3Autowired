@@ -1,0 +1,143 @@
+# [Spring]
+## @Autowired
+
+### @Autowired란 ?
+- 생성자나 세터 등을 사용하여 의존성 주입을 하려고 할 때, 해당 빈을 찾아서 주입해주는 'annotation'이다.
+
+### option
+- `required` 값을 `ture`나 `false`로 줄 수 있다.<br><br>
+- `true`인 경우는 의존성주입에 필요한 객체가 무조건 `bean`으로 등록되어있어야 한다.`@Autowired`
+or `@Autowired(requied = true)`<br><br>
+- `false`인 경우는 예를 들어, `setter`의 파라미터가 주입 되어야 되는 경우 , `bean`등록이 안되어있어도, 오류가 나지 않고 인스턴스는 만들어준다.<br>
+`@Autowired(required = false)`<br><br>
+- `default` 값은 `true`이다.<br>
+
+### 같은 타입의 Bean이 여러개인 경우
+- 만약 `RoomService`라는 객체가 있고, <br>
+그 객체에서 `RoomRepository`를 사용하기 위해 의존성 주입을 받아야 한다고 가정하고,<br>
+`RoomRepository`는 `interface`로 만들어주고, <br>
+`RoomRepository`를 `implements`하는 2개의 `Repository`가 있다고 한다.
+```java
+package com.basic.room;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class RoomService {
+
+    @Autowired
+    RoomRepository roomRepository;
+}
+
+```
+```java
+package com.basic.room;
+
+public interface RoomRepository {
+}
+```
+```java
+package com.basic.room;
+
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class RoomRepositoryOne implements RoomRepository {
+}
+```
+```java
+package com.basic.room;
+
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class RoomRepositoryTwo  implements RoomRepository{
+
+}
+```
+이 경우 그냥 `@Autowired` 를 사용해서 의존성 주입을 받으려고 하면, `spring`은 둘 중 어느 `Repository`가 사용되어야 하는지 몰라서 에러가 난다.<br>
+![img_19.png](img_19.png)<br><br>
+ 이렇게 동일한 타입의 빈이 여러개인 경우, 3가지 방법이 있다.<br><br>
+1. `@Primary`.
+2. `@Qualifier`.
+3. 동일 타입의 모든 `Bean`리스트로 받아오기.
+
+### Primary
+동일한 타입의 빈들 중 하나에 `@Primary` 'annotation'을 붙여준다. 그럼 그 빈이 우선권을 가지게 되어, 프로그램 실행 시, 해당 `Bean`으로 의존성 주입을 받아온다.<br><br>
+`RoomRepositoryOne`에 `@primary` 'annotation'을 추가해주면, 에러없이 실햄됨을 볼 수 있다.
+
+```java
+package com.basic.room;
+
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
+
+@Primary //<<
+@Repository
+public class RoomRepositoryOne implements RoomRepository {
+}
+
+```
+### @Qualifier
+- 빈의 `id`값을 어떤 `bean`을 사용할지 정해준다. 이 경우는 의존성 주입 해주는 쪽,<br>
+즉 `@Autowired`를 사용하고 있는 곳에 해준다. 빈의 `id`는 의존성 주입을 받아와야하는 타입의 클래스 명의 맨 앞 글자를 소문자로 바꾼 것이다.<br><br>
+- 아래의 `RoomRepositoryOne`의 `bean id` 값은 `roomRepositoryOne`이다.
+```java
+package com.basic.room;
+
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
+
+//@Primary
+@Repository
+public class RoomRepositoryOne implements RoomRepository {
+}
+
+```
+따라서 아래와 같이 사용할 수도 있다.<br><br>
+```java
+package com.basic.room;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+@Service
+public class RoomService {
+
+    @Qualifier("roomRepositoryOne")
+    @Autowired
+    RoomRepository roomRepository;
+}
+```
+### 동일 타입의 모든 Bean 리스트로 받아오기
+- List를 사용하여 같은 타입의 bean들을 모두 리스트에 담아주고 사용하는 것이다.
+```java
+package com.basic.room;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+
+@Service
+public class RoomService {
+
+//    @Qualifier("roomRepositoryOne")
+    @Autowired
+    RoomRepository roomRepository;
+
+    @PostConstruct
+    public void setup(){
+        System.out.println(roomRepository.toString());
+    }
+}
+```
+![img_20.png](img_20.png)<br><br>
+- `@PostConstruct` 라는 'annotation'을 이용하여 `List`를 출력해보았다, 
+- <br>`@PostConstruct`는 딱 한번만 실행되는 `Bean`의 `lifeCycle`로, <br>
+`@Autowired`로 의존성주입이 일어난 후, 시행되게 만들어주는 `annotation`이다.<br>
+생성자의 경우는 `bean`의 의존성 주입이 아직 일어나지 않지만, <br>
+`@PostConstruct`는 의존성주입이 일어난 후이다.
