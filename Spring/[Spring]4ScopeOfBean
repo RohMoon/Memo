@@ -1,0 +1,162 @@
+# [Spring]
+## Bean의 Scope
+
+### Bean의 scope
+- `IOC`를 처음 다뤘을때 , bean의 scope에 대해 잠깐 언급이 되었었다.<br>
+지금까지의 사용되었던 `Bean`들은 모두 싱글톤 타입의 `bean`들이었다. (`Default`값이 싱글톤이기 때문)<br><br>
+- 글톤이란 어플리케이션 전반에 해당 `Bean`의 인스턴스가 하나 뿐이라는 뜻이다. (대부분 싱글톤 사용)<br><br>
+- 만약 아래와 같이 두 개의 `Bean`이 있을 때,<br><br>
+
+```java
+package com.basic.scope;
+
+import org.springframework.stereotype.Component;
+
+@Component // bean으로 등록
+public class Proto {
+
+}
+```
+```java
+package com.basic.scope;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component //bean으로 등록
+public class Single {
+    //Single이 Proto를 가지게
+    @Autowired
+    private Proto proto;
+
+    public Proto getProto(){
+        return proto;
+    }
+}
+```
+그냥 `Proto`나 `Single.getProto()`를 하나, 둘 다 똑같은 `Proto`를 지칭하는 것이다.(싱글톤이기 때문)<br><bR>
+
+프로토타입은 매번 새로운 인스턴스를 만들어서 사용하는 것이다.<br>
+프로토타입으로 `scope`를 바꾸려면 `@Scope("prototype")이라는 어노테이션을 붙여야한다.<bR>
+```java
+package com.basic.scope;
+
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+@Component // bean으로 등록
+@Scope("prototype")
+public class Proto {
+}
+```
+이렇게 해주면, 사용할 때 마다 매번 다른 인스턴스를 생성한다.<bR><br>
+### 프로토 타입의 bean이 싱글톤 타입의 bean을 참조하는 경우
+- `proto`라는 `bean`은 매번 다른 인스턴스로 생성되지만, <br>
+참조하고 있는 `Single`은 매번 같은 인스턴스이므로 아무 문제가 없다.<bR><br>
+```java
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+@Component // bean으로 등록
+@Scope("prototype")
+public class Proto {
+
+    @Autowired
+    Single single; // 싱글톤 bean
+}
+```
+<br>
+
+### 싱글톤 타입의 bean이 프로토 타입의 bean을 참조하는 경우
+- `Single`이라는 `bean`은 싱글톤 타입이므로 단 한번만 만들어진다. 한 번 만들어 질때 참조하고 있는 프로토 타입의 `property`도 같이 세팅이 된다.<bR>
+따라서 이경우는 `Single`이 참조하고 있는 `Proto` 값이 변경되지 않는다.(`Proto`가 프로토타입 임에도 불구하고)
+```java
+package com.basic.scope;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component //bean으로 등록
+public class Single {
+    //Single이 Proto를 가지게
+    @Autowired
+    private Proto proto; //Single이 처음 만들어 질 때 같이 세팅되므로 값 변화X
+
+    public Proto getProto(){
+        return proto;
+    }
+}
+```
+<br>
+#### 해결방법
+만약 이러한 문제를 해결하려면 (`Proto`인스턴스를 업데이트 하려면) 여러 가지 방법이 있다.<br><br>
+1.proxyMode 설정
+
+```java
+package com.basic.scope;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.stereotype.Component;
+
+@Component // bean으로 등록
+//@Scope("prototype")
+@Scope(value = "prototype", proxyMode = ScopedProxyMode.TARGET_CLASS)
+public class Proto {
+
+    @Autowired
+    Single single; // 싱글톤 bean
+}
+```
+`Proto`라는 `bean`을 `proxy`로 감싸라고 알려주는 역할(`.TARGET_ClASS`는 클래스 기반의 `proxy`를 뜻함.)<br><br>
+다른 `bean`들이 `Proto`를 사용할 때, 이 `bean`을 감싸고 있는 `proxy bean`을 사용하게 하라는 의미.<br><br>
+다른 인스턴스(`Single`)들이 `proto`타입의 `scope`의 빈을 직접 참조하면 안되기 때문이다.(직접 참조하면, 매번 다른 인스턴스를 생성하지 못함.)<br><br>
+
+즉, `Proxy bean`이 `bean`으로 등록되고, 주입도 역시 `proxy bean`을 해주는 것이다. (`proxy`도  타입은 같기 때문에 주입해 줄 수 있는 것이다.)<br><br>
+
+2. Object Provide
+```java
+package com.basic.scope;
+
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component //bean으로 등록
+public class Single {
+
+    @Autowired
+    private ObjectProvider<Proto> proto;
+
+    public Proto getProto(){
+        return proto.getIfAvailable();
+    }
+}
+```
+참조하는 곳에서 `ObjectProvider`를 사용하여 프로토타입의 빈을 세팅해주면, `proto` 인스턴스가 업데이트 된다.<bR><br>
+
+#### 주의점
+- 싱글톤 객체 사용시 하나의 인스턴스만 생성되므로, 객체 내부에 변수 값이 존재할 경우, 여러 곳에서 그 값을 고치면 (멀티쓰레드),안전하지 못하다.(쓰레드 A가 number 값을 1로 바꾸고, 쓰레드 B가 `number`값을 2로) 바꿨다고 가정하면 ,A가 `number`값을 쓰려고 가져온 값이 2가 되어 있을 수도 있다.<br><br>
+```java
+package com.basic.scope;
+
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component //bean으로 등록
+public class Single {
+
+    @Autowired
+    private Proto proto;
+
+    int number = 0;
+
+    public Proto getProto(){
+        return proto;
+    }
+}
+```
