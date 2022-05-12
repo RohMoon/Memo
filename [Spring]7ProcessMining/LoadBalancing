@@ -1,0 +1,48 @@
+#[Spring]
+## MessageSource
+- `Application`의 기능 중에는 `MessageSource`도 있다.
+
+![img.png](img.png)<br><br?
+
+### MessageSource
+- 메시지를 다국화 할 수 있는 인터페이스이다.
+####예제
+먼저 `resources` 밑에 원하는 언어의 `messages.properties`파일을 만들어준다.<br>
+(ex 한글: `message_ko_KR.properties`, 영어 : `messages_en.properties`)<br><br>
+
+`messages.properties`파일의 내용은 `"key값"="value값"` 이 기본이며 원한다면 `{0}`, `{1}`등을 추가하여 원하는 `string`을 추가해서 사용할 수도 있다.<br><br>
+![img_1.png](img_1.png)<br>
+그 후 , `MessageSource`를 `Bean`으로 등록해준다. 이 때 이름은 `MessageSource messageSource`로 해줘야 한다.<br><br>
+`ReloadableResourceBundleMessageSource`객체를 생성해주고, <br>
+`setBasename`메서드로 아까 만들어준 `message` 프로퍼티가 존재하는 `bundle`을 가리키게 하고,<br>
+한글이 깨지지 않게 하기 위해 `UTF-8`로 인코딩 해준다.
+
+```java
+package com.basic.car;
+
+import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+
+@Configuration
+@ComponentScan(basePackageClasses = CarMain.class, value = "com.basic.environment")
+public class ApplicationConfig {
+
+    @Bean
+    public MessageSource messageSource() {
+
+        ReloadableResourceBundleMessageSource reloadableResourceBundleMessageSource = new ReloadableResourceBundleMessageSource();
+        reloadableResourceBundleMessageSource.setBasename("classpath:/messages");
+        reloadableResourceBundleMessageSource.setDefaultEncoding("UTF-8");
+        return reloadableResourceBundleMessageSource;
+    }
+}
+```
+그 후 `getMessage` 메서드를 사용해서 값을 가져올 수 있다.<br>
+첫 번째 인자는 `.properties` 파일에서 설정해준 `key`값이고 ,<br>
+두 번째 인자는 아까 `{0}`으로 표시해준 부분에 들어가는 `string` 값들이다.<br>
+세 번째 인자는 어떤 `properties` 파일을 사용할건지 정해주는 것이다.<br><br><br>
+![img_2.png](img_2.png)
+
