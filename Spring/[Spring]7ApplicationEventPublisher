@@ -1,0 +1,137 @@
+# [Spring]
+## ApplicationEventPublisher
+- Application 의 기능 중 ApplicationEventPublisher도 있다.
+![img_27.png](img_27.png)
+### ApplicationEventPublisher
+`ApplicationEventPublisher`는 이벤트 기반의 프로그래밍을 할 때 유용한 인터페이스이다.<br><br>
+이벤트 기반 프로그래밍이란, `Event` 객체가 있고, 그 `Event` 객체를 다루는 `EventHandler`객체가 있는 것이다.<br><br>
+
+`Event`객체에는 `data`도 담아서 다룰 수 있다.<br><br>
+```java
+package com.basic.applicationContext;
+import org.springframework.context.ApplicationEvent;
+// 어떤 데이터를 담아서 전송 할 수 있는 이벤트
+public class MyEvent extends ApplicationEvent {
+
+    private int data;
+
+    public MyEvent(Object source){
+        super(source);
+    }
+
+    public MyEvent(Object source, int data){
+        super(source);
+        this.data = data;
+    }
+
+    public int getData(){
+        return data;
+    }
+}
+```
+이 Event 객체를 다루는 `EventHandler` 객체는 `Bean`으로 등록이 되어야하며 `ApplicationListner`를 `implements`하여 `onApplicationEvent`메서드를 `override`하여 다룬다.
+```java
+package com.basic.applicationContext;
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyEventHandler implements ApplicationListener<MyEvent> {
+
+    @Override
+    public void onApplicationEvent(MyEvent myEvent) {
+        System.out.println("이벤트 발생" + myEvent.getData());// MyEvent 이벤트에서 data 가져옴.
+    }
+}
+```
+<br><br>
+`ApplicationEventPublisher` 객체의 `publishEvent` 메서드를 통해 실행한다.<br><br>
+```java
+@Component
+public class TestComponent {
+
+    @Autowired
+    ApplicationEventPublisher applicationEventPublisher;
+
+    @PostConstruct
+    public void run() {
+        applicationEventPublisher.publishEvent(new MyEvent(this, 100));//myEvent라는 이벤트를 발생시킴
+    }
+}
+```
+ 메인이 실행 되면, `eventPublisher.publishEvent(new MyEvent(this,100));`이 실행되면서, `MyEvent`를 발생시키고,<br><bR>
+ 등록되어 있는 `Bean` 중에서 `MyEventHandler`가 받아서 `onApplicationEvent`메서드가 실행되면서 이벤트에 있는 데이터를 가져온다.<br><br>
+
+> * 스프링 4.2부터는 `POJO` 구조로, `Spring`코드 없이 이벤트 기반의 프로그래밍을 할 수 있다.<br>
+> 이벤트 객체는 `ApplicationEvent` 를 `extends` 할 필요 없고, 이벤트 핸들러 객체는 `ApplicationListener`를 `implement`할 필요가 없다.<br><br>
+> 이벤트 핸들러 객체는대신 `@EventListener` 어노테이션을 사용한다. 이렇게 하면, 코드에 `Spring`코드가 들어가지 않게 된다.<br><br>
+
+```java
+package com.basic.applicationContext;
+
+import org.springframework.context.ApplicationEvent;
+
+// 어떤 데이터를 담아서 전송 할 수 있는 이벤트
+//public class MyEvent extends ApplicationEvent {
+public class MyEvent {
+
+    private int data;
+    private Object source;
+
+//    public MyEvent(Object source){
+    public MyEvent(Object source,int data){
+        this.source = source;
+        this.data = data;
+    }
+
+    public Object getSource(){
+        return source;
+    }
+
+    public int getData(){
+        return data;
+    }
+}
+
+```
+```java
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyEventHandler  {
+
+    @EventListener
+    public void print (MyEvent myEvent){
+        System.out.println("이벤트 발생"+ myEvent.getData());// MyEvent 이벤트에서 data 가져옴.
+    }
+```
+#### 순서를 줘야하는 경우
+- 만약 같은 이벤트를 다루는 이벤트 핸들러가 여러개인 경우, 순차적으로 진행된다. (A핸들러가 실행되고 ,B 핸들러가 실행됨, 반대가 될 수도 있음 뭐가먼저 실행될지는 모르지만 차례차례 진행 )(같은 스레드)<br><br>
+- 핸들러들의 순서가 필요한 경우는 `@Order`어노테이션을 사용한다.
+
+```java
+@Component
+public class AnotherHandler {
+    @EventListener
+    @Order(Ordered.HIGHEST_PRECEDENCE)// 가장 높은 우선순위이므로 , 가장 먼저 실행
+    public void check(MyEvent myEvent){
+        System.out.println("Another Handler" + myEvent.getData());
+    }
+}
+```
+
+```java
+@Component
+public class MyEventHandler  {
+
+    @EventListener
+    @Order(Ordered.HIGHEST_PRECEDENCE +2 )//가장 높은  우선순위에 숫자를 더해줘서 가장 높은 우선순위보다 2단계 뒤의 우선순위를 가짐.
+    public void print (MyEvent myEvent){
+        System.out.println("이벤트 발생"+ myEvent.getData());// MyEvent 이벤트에서 data 가져옴.
+    }
+```
+#### 비동기로 해야하는 경우
+비동기인 경우 각각 쓰레드에서 실행되므로, `Order`가 의미가 없다. 어떤 스레드가 먼저 실행될지는 정할 수 없다.<br><bR>
+각각 핸들러에 `@Async` 어노테이션을 붙여주고 , 메인에서 `@EnableAysnc` 어노테이션을 붙여주면 된다.
