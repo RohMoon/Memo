@@ -1,0 +1,282 @@
+# [Spring]
+
+## Environment의 2가지 기능 프로파일 (Profile ) & 프로퍼티(Property)
+
+- `ApplicationContext` 는 `BeanFactory` 기능 말고도 여러가지 기능을 가지고 있다.
+
+### Environment 기능
+
+- `ApplicationContext`는 `EnvironmentCapable`를 상속 받고 있다.
+  ![img_21.png](img_21.png)<br>
+- EnvironmentCapable 은 2가지 기능이 있다.
+
+1. 프로파일
+2. 프로퍼티
+
+### 프로파일 기능
+
+- 프로파일은 `Bean`들의 묶음이다. (테스트 환경에서는 어떤 묶음의 `Bean`들을 쓰겠다.<br>
+  실제 배포에서는 어떤 묶음의 `Bean`들을 쓰겠다는 것이다.)<br><br>
+- `Environment` 는 활성화 할 프로파일을 확인하고 설정해주는 것이다.<br><br>
+- 기본적으로는 `default` 프로파일로 설정되어 있다.
+- `Default` 프로파일은 직접 프로파일 설정하지 않아도 적용되는 프로파일이다.<bR>
+  직접 생성한 `Bean`들도 따로 어떤 프로파일에 들어가는지 설정하지 않으면 전부 `Default` 프로파일에 속한다.<br><br>
+- `Bean`에 특정 프로파일을 설정하려면 `@Profile("프로파일이름")`형식으로 지정해준다.<br>
+  (`@Component` ,`@Profile("")`)도 마찬가지로 사용가능하다.)
+
+```java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+
+@Configuration
+@Profile("test")
+public class TestConfiguration {
+    // test 프로파일 일 때만 사용 되는 빈 설정 파일
+    // test라는 프로파일로 이 어플리케이션을 실행해야지만 적용
+
+    @Bean
+    public BookRepository bookRepository() {
+        return new TestRepository();
+    }
+}
+```
+
+또한 클래스가 아닌 메서드 자체에도 사용 가능하다.
+
+```java
+package com.basic.environment;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+
+@Configuration
+@Profile("test")
+public class TestConfiguration {
+    // test 프로파일 일 때만 사용 되는 빈 설정 파일
+    // test라는 프로파일로 이 어플리케이션을 실행해야지만 적용
+
+    @Bean
+    @Profile("test")//메서드 자체에 프로파일 표시
+    public BookRepository bookRepository() {
+        return new TestRepository();
+    }
+}
+```
+
+프로파일 이름을 줄 때, 표현식(!,&,|)도 사용 가능하다.
+
+```java
+
+@Configuration
+@Profile("!proud & test") //표현식 사용 가능
+public class TestConfiguration {
+    // test 프로파일 일 때만 사용 되는 빈 설정 파일
+    // test라는 프로파일로 이 어플리케이션을 실행해야지만 적용
+
+    @Bean
+    public BookRepository bookRepository() {
+        return new TestRepository();
+    }
+}
+```
+
+이 후 이 `Bean`이 사용하려고 하면 실행오류가 난다.<br>
+왜냐하면 `test` 프로파일을 적용해주지 않았기 때문이다. <br>
+`test`프로파일을 적용하기 위해서는 아래와 같이 해주어야 한다.<br><bR>
+
+먼저 실행 버튼 좌측을 눌러 `Edit Configuration`을 누른다.<br><br>
+![img_22.png](img_22.png)
+<br><br>
+그 후, VM options에 `-Dspring.profiles.active="프로파일명1, 프로파일명2.."`를 적어주고 적용하면 된다.
+![img_23.png](img_23.png)<br><br>
+
+- 현재 적용중인 프로파일과 `default` 프로파일을 확인해볼 때 사용하는 코드
+
+```java
+ /*
+ * 현재 적용중인 프로파일과 `default` 프로파일을 확인해볼때 사용하는 코드
+ * */
+@Configuration
+public class TestConfiguration {
+
+    @Autowired
+    Environment environment;
+
+    // test 프로파일 일 때만 사용 되는 빈 설정 파일
+    // test라는 프로파일로 이 어플리케이션을 실행해야지만 적용
+    @PostConstruct
+    public void print() {
+        System.out.println(Arrays.toString(environment.getActiveProfiles())); // 현재 적용된 프로파일
+        System.out.println(Arrays.toString(environment.getDefaultProfiles()));// default 프로파일.
+    }
+}
+```
+
+![img_24.png](img_24.png)<br><br>
+
+### 프로퍼티 기능
+
+- 어플리케이션에 등록되어 있는 여러 `key-value`로 제공되는 프로퍼티에 접근 할 수 있는 기능이다.<br><br>
+- 여러 프로퍼티들은 계층형 구조이다.( 우선 순위가 존재한다는 뜻)<br><br>
+- 프로퍼티를 설정해주는 방법은 아래와 같다.<br><Br>
+  `resource` 디렉토리에 `~.properties` 파일을 만들어준다.
+  ![img_25.png](img_25.png)<br><br>
+- 아래와 같이 `key-value` 꼴로 값을 미리 정해놓을 수 있다.
+- ![img_26.png](img_26.png)
+- 그 후 , `@PropertySource` 라는 어노테이션을 사용해서 이 어플리케이션이 만들어준 `app.properties`파일을 참조할 수 있도록 한다.<br><br>
+
+```java
+package com.basic.environment;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+
+@Configuration
+@PropertySource("classpath:/app.properties")
+public class TestConfig {
+
+}
+```
+
+이 프로퍼티를 가져올 수 있는 방법 중 2가지를 알아보려고 한다.
+
+#### getProperty
+
+`Environment` 객체의 `getProperty` 메서드를 이용해서 프로퍼티 값을 가져올 수 있다.<br>
+`properties`파일의 `key`에 해당하는 값으로 값을 가져온다.<br><br>
+
+```java
+package com.basic.environment;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+
+import javax.annotation.PostConstruct;
+
+public class TestComponent {
+
+    @Autowired
+    Environment environment;
+
+    @PostConstruct
+    public void print() {
+        System.out.println(environment.getProperty("my.hobby"));
+    }
+}
+```
+
+<details
+><summary style="color: goldenrod"> @PostConstruct </summary>
+
+> `@PostConstruct` 란?
+> 의존성 주입이 이루어진 후 초기화를 수행하는 메서드이다.
+> `@PostConstruct` 가 붙은 메서드는 클래스가 `service`(로직을 탈 때 ?)를 수행하기 전에 발생한다.<br>
+> 이 메서드는 다른 리소스에서 호출되지 않는다해도 수행된다.
+> 사용 이유 (장점)
+> 1) 생성자(일반)가 호출 되었을 때, 빈(bean)은 아직 초기화 되지 않았다.(예를 들어, 주입된 의존성이 없음.)<br>
+     > 하지만 , `@PostConstruct`를 사용하면, 빈(`bean`)이 초기화 됨과 동시에 의존성을 확인 할 수 있다.
+     > 클래스 내에 `@Autowired`를 붙여서 객체를 사용할 때, 생성자가 필요하다면
+     > `@PostConstruct`를 사용하면 될 것 같다. 빈(bean)이 등록되고 사용할 수 있으니까 말이다.
+> 2) `bean lifeCycle` 에서 오직 한 번만 수행된다는 것을 보장할 수가 있다. (`WAS`가 올라가면서 `bean`이 생성될 때 딱 한 번 초기화함.)<br>
+     > `@PostConstruct`를 사용하면 `bean`이 여러번 초기화되는 것을 방지할 수 있다.
+</details>
+<details><summary>스프링 빈 생명주기 콜백</summary>
+데이터베이스 커넥션 풀이나, 네트워크 소켓처럼 애플리케이션 시작 시점에 필요한 연결을 미리 해두고,
+애플리케이션 종료 시점에 연결을 모두 종료하는 작업을 진행하려면, 객체의 초기화와 종료 작업이 필요하다.
+
+빈 생명주기 콜백은 스프링 빈이 생성된 후 의존관계 주입이 완료되거나 죽기 직전에 스프링 빈 안에 있는 메서드를 호출해주는 기능이다.
+</details>
+</details>
+<details><summary>스프링 빈의 이벤트 사이클</summary>
+스프링 컨테이너 생성 -> 스프링 빈 생성 -> 의존관계 주입 -> 초기화 콜백 -> 사용 -> 소멸전 콜백-> 스프링 종료<br>
+<bR>
+초기화 콜백 : 빈이 생성 되고, 빈의 의존관계 주입이 완료된 후 호출
+소멸전 콜백 : 빈이 소멸되기 직전에 호출.<br><br>
+
+스프링 빈은 크게 3가지 방법으로 빈 생명주기 콜백을 지원
+
+- 인터페이스(InitializingBean, DisposableBean)
+- 설정 정보 초기화 메서드, 종료 메서드 지정
+- `@PostConstruct`, `@PreDestroy`
+
+#### @PostConstruct, @PreDestroy
+
+아래 나오는 방법보다는 이 방법을 사용하자.
+
+최신 스프링에서 가장 권장하는 방법이다. 메서드 위에 어노테이션 하나만 붙이면 되므로 매우 편리하다.
+
+```java
+...
+@PostConstruct
+public void init(){
+        System.out.println("초기화  메서드 호출");
+        }
+
+@PreDestroy
+public void destroy(){
+        System.out.println("종료 메서드 호출");
+        }
+
+```
+패키지를 잘 보면 `javax.annotation.PostConstruct`이다.<br>
+스프링에 종속적인 기술이 아니라 `JSR-250` 이라는 자바 표준이다.<bR>
+따라서 스프링이 아닌 다른 컨테이너에서도 동작한다.
+
+컴포넌트 스캔과 잘 어울린다.
+
+유일한 단점은 외부 라이브러리에는 적용하지 못한다는 것이다. 외부 라이브러리를 초기화, 종료 해야 하면 `@Bean`의 기능을 사용하자. 
+
+#### InitializingBean, DisposableBean
+- `InitializingBean`, `DisposableBean` 은 인터페이스이며 `afterPropertiesSet()`, `destroy()`를 지원한다.
+  - afterPropertiesSet() : 의존관계 주입이 끝난 후 호출
+  - destroy() : 빈이 죽기 직전에 호출
+- 단점 : 
+  - 이 인터페이스는 스프링 전용 인터페이스다. 해당 코드가 스프링 전용 인터페이스에 의존한다.
+  - 초기화, 소멸 메서드의 이름을 변경할 수 없다.
+  - 내가 코드를 고칠 수 없는 외부 라이브러리에 적용할 수 없다.<br><br>
+###  빈 초기화, 소멸 메서드 지정
+  - 설정 정보에 Bean(initMethod = "init", destroyMethod="close")처럼 초기화, 소멸메서드를 지정할 수 있다.<br><bR>
+  - 메서드 이름을 자유롭게 줄 수 있고, 스프링 빈이 스프링 코드에 의존하지 않는다.<br>
+  또한 코드가 아니라 설정 정보를 사용하기 때문에, 코드를 고칠 수 없는 외부 라이브러리에도 초기화, 종료 메서드를 적용시킬 수 있다.<br><br><br>
+  - 추론
+    - `@Bean`의 `destroyMethod` 속성에는 특별한 기능이 있다.
+    - 라이버르리는 대부분 `close`, `shutdown` 이라는 이름의 종료 메서드를 사용한다.<br>
+    - `@Bean` 의 `destroyMethod`는 기본값이 (`inferred`) 추론 으로 등록 되어 있다.<br>
+    이 추론 기능은 `close`,`shutdown`이라는 이름의 메서드를 자동으로 해출해준다. 이름 그대로 종료 종료 메서드를 추론해서 호출해준다.<br>
+    따라서 직접 스프링 빈으로 등록하면 종료 메서드는 따로 적어 주지 않아도 잘 동작한다.<br>
+    추론 기능을 사용하기 싫으면 `destroyMethod =""`처럼 빈 공백을 지정하면 된다.
+</details>
+
+#### Value
+- `@Value` 어노테이션을 사용해서 값을 가져올 수도 있다. `properties` 파일의 `key`에 해당하는 값으로 값을 가져온다.<br><br>
+```java
+package com.basic.environment;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+
+@Component
+public class TestComponent {
+
+    @Autowired
+    Environment environment;
+
+    @Value("${my.name}")
+    String name;
+
+    @PostConstruct
+    public void print() {
+        System.out.println(environment.getProperty("my.hobby"));
+        System.out.println(environment.getProperty("my.name"));
+    }
+}
+```
+#### 주의사항
+`Enviroment`객체를 주입받아 사용하려 할 때, null 값이 들어가는 경우가 있다.<br>
+이 경우 해달 클래스가 `bean`으로 등록되어 있는지 확인해보는 것을 추천한다.
