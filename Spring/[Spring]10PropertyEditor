@@ -179,10 +179,40 @@ Y : 결제 완료 되었습니다.  <b><u>서버는 들어온 요청을 처리�
 단점은 클라이언트가 클라이언트가 하고자하는 최종 목적을 위해 지나는 과정마다 점점 전달해야하는 내용이 많아진다는 것이다.<br><br>
 `HTTP`는 이 무상태를 특징으로 기본적으로 가지고 있다. <bR>
 특별한 일이 없다면 무상태를 지향해야하며 정말 필요한 경우에만 상태 유지를 해야한다.
-
-
-
-
 </details>
 즉, <b style="color:orange"> 여러 쓰레드에 공유해서 사용하면 안된다.(`Bean`으로 등록해서 사용하면 안된다)</b><br>
-`Bean`으로 등록해서 사용하면, 1번 회원이 2번 회원 정보를 수정하는 등 심각한 문제가 생길 수 있다.
+`Bean`으로 등록해서 사용하면, 1번 회원이 2번 회원 정보를 수정하는 등 심각한 문제가 생길 수 있다.<br><br>
+만들어준 `Editor`를 사용하기 위해 위에서 만들어줬던 `Controller`에 `@InitBinder` 어노테이션을 사용하여 컨트롤러에서 사용할 `Binder`를 등록해줘야 한다.
+
+```java
+package com.basic.applicationContext;
+
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class EventController {
+    
+    @InitBinder // 컨트롤러에서 사용할 바인더 등록
+    public void init(WebDataBinder webDataBinder){
+        // WebDataBinder에 Event 클래스 타입을 처리할 PropertyEditor 등록
+        // WebDataBinder에 DataBinder의 구현체 중 하나
+        webDataBinder.registerCustomEditor(Event.class,new EventEditor());
+
+    }
+
+    //event/1
+    //event/2
+    //이런식으로 요청이 들어오면 입력한 숫자를 Event 타입으로 변환하여 스프링이 받는다.
+    @GetMapping("/event/{event}")
+    public String getEvent(@PathVariable Event event){ //@PathVariable로 Event를 도메인으로 받음.
+        System.out.println(event);
+        return event.getId().toString();
+    }
+}
+```
+<br>
+실행 시키면, 컨트롤러가 어떤 요청을 처리하기 전에 컨트롤러에서 정의한 데이터바인더에 들어있는 `PropertyEditor`를 사용해준다.
