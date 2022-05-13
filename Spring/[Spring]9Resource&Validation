@@ -1,0 +1,158 @@
+# [Spring]
+## Resource & Validation
+
+### Resource 추상화
+- `java.net.URL`이라는 클래스를 `org.springframework.core.io.Resource`라는 클래스로 감싸서 실제 `low`레벨에 있는 `Resource`에 접근하는 기능을 만든 것.
+- `Resource`자체를 추상화 시킨 것이다.(가져오는 방법은 `ResourceLoader`를 사용한다.)
+
+#### 메서드
+
+- `Resource` 객체는 여러가지 메서드가 있다.
+  - `exists()` : 존재하는지 여부 확인
+  - `isOpen()` : 열 수 있는 지 확인
+  - `getDescription()` : 파일이름,실제 URL
+- 이 외에도 여러가지 메서드들이 존재한다.
+
+#### 구현체
+- `Resource`의 구현체도 여러가지가 있다.
+  - `UrlResource` : 기본으로 지원하는 프로토콜 (http, https, ftp, etc)
+  - `ClassPathResource` : `classpath` 접두어 사용
+  - `FileSystemResource` :
+  - `ServletContextResource` :  가장 많이 사용.
+- 리소스를 읽어올 때, `ApplicationContext`의 타입에 따라 어떤 구현체로 `resolving`되는지 결정된다.<br><br>
+- 만약 `var context = new FileSystemXmlApplicationContext("~~.xml");`이 `applicationContext` 타입을 사용하면`FileSystemResource`로 `resolving`되는 것이다.<br><br>
+- ![img_30.png](img_30.png)
+
+
+### Validation 추상화
+- 어플리케이션에서 사용하는 객체들을 검증할 때 사용하는 인터페이스이다.<br><br>
+- 이 인터페이스를 구현하려면 2가지 메서드를 구현해주어야 한다.<br><br>
+- `supports` 메서드 : 검증해야하는 인스턴스의 클래스가 `validator`가 지원하여 검증할 수 있는 클래스인지 확인하는 메서드<br><br>
+- `validate` 메서드 : 실질적으로 검증 작업이 일어나는 곳.<br><br>
+
+#### 예제
+- 내부에 `id`와 `title`이라는 값을 가지고 있는 `Event`라는 클래스가 있다고 할 때, `title`값이 비어 있으면 안된다는 조건이 있을 때, `validator`를 사용할 수 있다.<br><br>
+- 내부에 `id`와 `title`이라는 값을 가지고 있는 `Event`라는 클래스를 아래와 같이 만들어 줄 수 있다.<br><br>
+```java
+package com.basic.applicationContext;
+
+public class Event {
+
+  Integer id;
+
+  String title; // 비어있으면 안됨.
+
+  public Integer getId() {
+    return id;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+}
+```
+- `title`값이 비어있으면 안되기 때문에 `Validator`를 만들어 준다. <bR>
+위에서 말한 것 처럼 `supports`와 `validate` 두 가지 메서드를 구현해주어야한다.
+```java
+package com.basic.applicationContext;
+
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+
+public class EventValidator implements Validator {
+    @Override
+    public boolean supports(Class<?> aClass) {
+        return false;
+    }
+
+    @Override
+    public void validate(Object o, Errors errors) {
+
+    }
+}
+```
+- `supports` 메서드에서 파라미터로 전달되는 `aClass`의 타입이 우리가 임의로 만들어준 클래스인지 확인해준다.<br><br>
+
+```java
+    @Override
+    public boolean supports(Class<?> aClass) {
+     return Event.class.equals(aClass);// 파라미터로 전달되는 aClass의 타입이 Event(우리가 임의로 만들어준 클래스)인지 확인.
+    }
+```
+- 실제로 검증작업이 일어나는 `validate`에는 `rejectIfEmptyOrWhiteSpace`를 사용하여, 비어있으면 안된다는 걸 나타내준다.<br><br>
+  (`field`는 `event` 객체의 `String title;`을 가리키고, `errorCode`는 에러[여기서는 `title`값이 비어있을 때 에러 발생]가 났을때, 그 에러를 나타내는 `key` 값이다.)
+
+```java
+@Override
+    public void validate(Object o, Errors errors) {
+    //errorCode는 key값
+    // defaulMessage : errorCode로 메세지를 찾지 못했을 때, 사용할 메시지
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors,"title","notempty","Empty title is not allowed");
+    }
+```
+- `title`에 값을 넣어주지 않고, 메인에서 실행해보면
+```java
+package com.basic.car;
+
+import com.basic.applicationContext.Event;
+import com.basic.applicationContext.EventValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.env.Environment;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Errors;
+
+import javax.annotation.PostConstruct;
+import java.util.Arrays;
+
+public class CarMain {
+
+  //    @Autowired
+//    Environment environment;
+  public static void main(String[] args) {
+    Event event = new Event();//이벤트 객체 생성
+    EventValidator eventValidator = new EventValidator();//validator 생성
+    // 에러를 담는 객체, 어떤 객체를 검사할 것이며, 어떤 이름인지
+    Errors errors = new BeanPropertyBindingResult(event, "event");
+
+    eventValidator.validate(event, errors); //event 객체를 검사하고, errors에 검증에러를 담아줌.
+
+    System.out.println(errors.hasErrors());// error가 있는지 확인.
+
+    errors.getAllErrors().forEach(e -> {
+      System.out.println("===== error code =====");
+      Arrays.stream(e.getCodes()).forEach(System.out::println);// validate메서드에서 정해준 errorCode 값들
+      System.out.println(e.getDefaultMessage()); //validate 메서드에서 정해준 defaultMessage 값
+    });
+  }
+}
+```
+- `error`가 발생하므로, `true`가 출력된다.<br>
+아까 설정해준 `errorCode(notempty)`에서 파생된 `errorCode`값들도 출력되고, `defaultMessage` 값도 마찬가지로 출력되는것을 볼 수 있다.
+- ![img_31.png](img_31.png)
+- 요즘에는 위의 방식보다는 어노테이션을 사용한 방법을 더 많이 사용한다.
+- Validator 를
+```java
+EventValidator eventValidator = new EventValidator(); 
+```
+이렇게 직접 생성하는 대신, 의존성을 주입을 받고,
+```java
+@Autowired
+Validator validator;
+```
+주입 받은 `valdidator`의 `validate` 메서드로 검증한다.<br><br>
+```java
+validator.validate(event,errors);
+```
+검증 받는 `event`객체에는 여러 어노테이션을 사용하여, 검증작업을 거친다.<br><br>
