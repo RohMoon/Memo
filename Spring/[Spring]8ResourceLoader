@@ -1,0 +1,25 @@
+#[Spring]
+## ApplicationContext
+### ResourceLoad 란?
+- 리소스를 로딩해주는 인터페이스를 `ApplicationContext`가 상속 받아서 구현하는 것이다.<br><br>
+- `ResourceLoader` 객체를 생성하여,<br>
+```java
+@Autowired
+ResourceLoader resourceLoader;
+```
+`getResource` 메서드를 사용하여 경로를 입력해줘서 사용한다.<br><br>
+```java
+Resource resource = resourceLoader.getResource("classpath:test.txt"); //리소스를 가져옴
+System.out.println(resource.exists());
+```
+<br>
+- 이 예시에서 `resource` 폴더 밑에 `test.txt`가 없는 상태이므로 실행시켜보면 `false`가 출력된다.<br><br>
+
+```java
+false
+```
+- 만약 `resource`에 `test.txt`를 추가 시켜주고 다시 실행시켜주면,<br>
+![img_28.png](img_28.png)<br><br>
+-`true`가 출력된다.<br>
+- ![img_29.png](img_29.png)<br><br>
+-`getResource` 메서드 말고도 여러 메서드가 존재한다.
