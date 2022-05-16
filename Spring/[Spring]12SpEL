@@ -1,0 +1,66 @@
+# [Spring]
+## SpEl
+### SpEL 이란?
+- `Spring Expression Language`의 약자이다.<br>
+- 객체 그래프를 조작하고 조회하는 기능을 한다.
+### 사용방법
+- 표현식 : `#{"표현식"}`
+ ```java
+@Value("#{1 + 1}")
+int a;
+```
+<br>
+- 프로퍼티 : `${"프로퍼티"}`
+
+```java
+@Value("${my.name}")
+String name;
+```
+- 표현식으로 프로퍼티를 감싸서 사용할 수 있다.(But 프로퍼티로 표현식을 감싸서 사용할 수는 없다.)
+```java
+@Value("#{${my.name} eq 'sangmoon'}")
+boolean a;
+```
+- 표현식으로 빈의 정보 가져오기
+```java
+package com.basic.car;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ComponentValueSample {
+
+    private int data = 100;
+
+    public int getData() {
+        return data;
+    }
+
+    public void setData(int data) {
+        this.data = data;
+    }
+}
+```
+```java
+    @Value("#{componentValueSample.data}")
+    int data;
+```
+```java
+System.out.println(vs.data);
+```
+![img_32.png](img_32.png)
+-이처럼 빈에 있는 값을 가져와서 출력할 수 있다.<br><br>
+SpEL을 지원하는 기능들이 더 있는데,
+- `@ConditionalOnExpression`
+  - `@ConditionalOn` 어노테이션은 선택적으로 빈을 등록하거나 빈 설정 파일을 읽어들일 때 사용하는 어노테이션인데,<br>
+  이 경우에 `Expression` 기반으로 빈을 선별할 수 있다.<br><br>
+- 스프링 시큐리티
+  - 메서드 시큐리티, `@PreAuthorize`, `@PostAuthorize`,`PreFilter`, `@PostFilter`
+  - 시큐리티에서 사용되는 함수들은 `EvaluationContext`에서 오는 것이다. <br><br>
+  `EvaluationContext`로 `Bean`을 만들어주면 빈이 제공하는 함수들을 쓸 수 있다.<br><br>
+- 스프링 데이터
+  - 스프링 데이터의 `@Query` 어노테이션 같은 경우에도 메서드에서 받은 파라미터 인자에 들어있는 필드 값을 참조하거나 인덱스 기반으로 참조해서 사용할 수 있다.<br><br>
+- Thymeleaf
+  - 스프링 프로젝트 뿐만 아니라 `Thymeleaf`라는 뷰템플릿 엔진에서도 `SpEL`을 지원한다.
+- 
