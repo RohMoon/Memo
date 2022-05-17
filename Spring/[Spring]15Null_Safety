@@ -1,0 +1,38 @@
+# [Spring]
+## Null-safety
+- spring 5버전에 추가된 어노테이션
+- Tool(IntelliJ)의 지원을 받아 컴파일 타임에 최대한 Null Point Exception을 방지하기 위한 것이다.
+- `Null`을 허용하는지 허용하지 않는지 어노테이션으로 나타낸다.
+```java
+package com.basic.applicationContext.nullSafety;
+
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
+
+@Service
+public class EventServiceEx {
+    @NonNull //return도 null을 허용 하면 된다
+    public String createEvent(@NonNull String name) {
+        return "hello" + name;
+    }
+}
+```
+- tip) intellij 에서 `runtime assertion`을 추가해주면, `@NonNull`을 사용했을 때,<br>
+`warning`을 확인 할 수 있다.
+`Preferences / Setting`로 들어가서 
+- ![img_39.png](img_39.png)
+- `Build`, `Execution`, `Deployment`의 `compiler`에서 `Configure annotations`를 클릭한다.
+- ![img_40.png](img_40.png)
+- spring 관련 어노테이션이 포함되어 있지 않기 때문에 추가해주어야 한다.
+- 먼저 `Nullable`을 추가해준다.
+- ![img_41.png](img_41.png)
+- ![img_42.png](img_42.png)
+- 그 후, NonNull을 추가해주고 프로젝트를 재실행한다면?
+- ![img_43.png](img_43.png)
+- ![img_44.png](img_44.png)
+- NonNull을 사용한 메서드에 `null`값을 넘기려고 하면 `warning`이 발생함을 볼 수 있다.
+- ![img_45.png](img_45.png)
+- 패키지 레벨로 `NonNull`을 설정해줄수도 있다.<br><br>
+- ![img_46.png](img_46.png)
+- 이렇게하면, 해당 패키지 내의 모든 파라미터에 `NonNull`을 적용하는 것과 마찬가지의 효과이다.<br>
+- 이렇게하고, `Null`을 허용하고 싶은 곳에만, `@Nullable`을 붙여줘도 된다.
