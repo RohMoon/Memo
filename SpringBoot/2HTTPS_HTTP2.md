@@ -95,3 +95,4 @@
         -> `[Project Settings] Modules`에서 `Dependencies`탭을 눌러 -> `Module SDK`를 추가해준  -> `apply` 버튼 해주면 된다.)
     터미널에 `curl -I -k --http2 https://localhost:8443/hello` 명령어로 확인해보면 HTTP2로 응답이 오는 것을 볼 수 있다.<br><br>
   ![img_8.png](img_8.png) 
+  
