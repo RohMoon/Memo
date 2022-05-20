@@ -1,0 +1,451 @@
+# [SpringBoot]
+## TEST
+### 테스트란?
+- 테스트 파일에는 `@SpringBootTest`어노테이션이 붙어 있는데, <br>
+`@SpringBootTest`어노테이션은 `@SPringBootApplication` 어노테이션이 붙어있는 스프링 메인 어플리케이션을 찾아간다.<br><br>
+그리고 메인에서 부터 시작하는 모든 `Bean`스캔을 한다. 그 모든 것을 테스트용 어플리케이션 `context`를 만들면서 모든 `Bean`을 등록해준다.<br><br>
+그 후 `MockBean`을 찾아서 그 `Bean`만 교체해준다. 교체된 `MockBean`은 테스트마다 리셋된다.<br><br>
+
+### 테스트 예시
+- 아래와 같이 `SampleController`가 `SampleService` 호출해서 `/hello`라는 요청을 보내면 `hello`메서드가 실행되는 코드가 있다고 한다.<br><br>
+![img_59.png](img_59.png)<br><br>
+- 이 코드를 테스트 해보려고 한다.<br>
+- `SampleController`에서 `alt`+`i`키를 눌러 `TEST` 파일을 생성해준다.<br><br>
+![img_60.png](img_60.png)<br><br>
+- `test`를 하려면 `pom.xml`에 아래의 의존성이 있어야한다.
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-test</artifactId>
+    <scope>test</scope>
+</dependency>
+```
+<br>
+
+클래스를 `public`으로 바꿔주고, `@SpringBootTest`어노테이션과 `@RunWith(SpringRunner.class)`어노테이션을 붙여준다.<br><br>
+
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class SampleControllerTest{
+    
+}
+```
+
+`@SpringBootTest `어노테이션에는 `webEnvironment`라는 속성이 있다. 기본 값은 `MOCK`이다.
+
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+class sampleControllerTest {
+
+}
+```
+### Mock 타입 테스트
+- Mock 타입은 서블릿 컨테이너 (톰캣 같은 것)를 테스트용으로 띄우지 않고, `Mockup`을 해서 서블릿을 `Mocking` 한 것을 띄워준다.<br><br>
+`dispatcherServlet`이 만들어지긴 하는데 `Mockup`이 되어, `dispatcherServlet`에 요청을 보내는 것' 처럼' 실험을 할 수 있다. <br><br>
+이 때 `mockup`된 서블릿과 상호 작용을 하려면 `MockMVC`라는 클라이언트를 사용해야 한다.<br><br>
+
+`MockMVC` 라는 클라이언트를 사용하려면 `@AutoConfigureMockMvc` 어노테이션을 붙여주고, 주입받아오면 된다.
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@AutoConfigureMockMvc
+class sampleControllerTest {
+    @Autowired
+    MockMvc mockMvc;
+}
+```
+- 그 후 테스트를 작성하면 된다. `perform(get())`은 `get`요청을 보내는 것이고, `andExpect`는 '~하길 기대하는 것'이다.<br>
+- 마지막으로 `andDo`는 ~해달라는 뜻이다. (어떤 `Controller`를 썼냐, 어떤 `Controller`의 어떤`Method`를 호출했냐 등의 다른 옵션들도 존재)
+```java
+package com.sm.sample;
+
+import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@AutoConfigureMockMvc
+class sampleControllerTest {
+
+    @Autowired
+    MockMvc mockMvc;
+
+    @Test
+    public void hello() throws Exception{
+        mockMvc.perform(get("/hello"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("hello no mother"))
+                .andDo(print());
+    }
+}
+```
+
+- (hello라는 get요청을 보내고, result 값이 200으로 오길 바라고 , 내용이 hello sangmoon이길 바라며, 출력해달라는 뜻)
+![img_61.png](img_61.png)
+
+### RANDOM-PORT / DEFINED-PORT 타입
+- 실제로 서블릿 컨테이너(톰캣)가 뜬다. 테스트용 `rest template`이나, 테스트용 웹 클라이언트를 사용해야 한다.<br><br>
+`RANDOM-PORT`는 랜덤한 포트를 배정받고, `DEFINED-PORT`는 포트를 정해줄 수 있다.<br><br>
+
+#### TestRestTemplate
+- TestRestTemplate를 주입받는다.
+```java
+package com.sm.sample;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
+class sampleControllerTest {
+
+    @Autowired
+    TestRestTemplate testRestTemplate;
+
+    @Test
+    public void hello() throws Exception {
+
+    }
+}
+```
+테스트를 작성해준다. url을 주고, 원하는 바디 타입을 준 후, `assertThat`으로 확인해준다.<br><br>
+
+```java
+package com.sm.sample;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@RunWith(SpringRunner.class)
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
+class sampleControllerTest {
+
+    @Autowired
+    TestRestTemplate testRestTemplate;
+
+    @Test
+    public void hello() throws Exception {
+        String result = testRestTemplate.getForObject("/hello", String.class);
+        assertThat(result).isEqualTo("helloMoonOf!");
+    }
+}
+```
+- 만약 테스트를 `SampleService`까지 가지 말고, SampleController 까지만 테스트 하고 싶을 때는 `@MockBean`어노테이션을 사용하여 `Service`를 만들어 컨트롤 할 수 있다. 
+<br>`@MockBean`으로 `SampleService`를 받아준다. 
+```java
+package com.sm.sample;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+
+@RunWith(SpringRunner.class)
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
+public class sampleControllerTest {
+
+    @Autowired
+    TestRestTemplate testRestTemplate;
+
+    @MockBean
+    SampleService sampleService;
+
+    @Test
+    public void hello() throws Exception{
+        String result = testRestTemplate.getForObject("/hello",String.class);
+        assertThat(result).isEqualTo("helloMoonOf!");
+    }}
+```
+- 그러면 `application context`안에 들어있는 이 `SampleService Bean`을 `@MockBean`으로 교체해준다.<br>
+그래서 실질적으로 `SampleService`는 `mockSampleService`를 사용하게 된다.<br><br>
+
+이 `mockSampleService`로 테스트 해보려면 아래와 같이 테스트 코드를 작성할 수 있다.<br><br>
+```java
+package com.sm.sample;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
+
+@RunWith(SpringRunner.class)
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
+public class sampleControllerTest {
+
+    @Autowired
+    TestRestTemplate testRestTemplate;
+
+    @MockBean
+    SampleService sampleService;
+
+    @Test
+    public void hello() throws Exception {
+        when(sampleService.getName()).thenReturn("js");
+        String result = testRestTemplate.getForObject("/hello", String.class);
+        assertThat(result).isEqualTo("helloMoonOf!");
+    }
+}
+```
+- 원래 `SampleService`에서 `getName`은 `helloMoonOf!` 라는 문자열을 리턴하지만, `mockSampleService`는 `js`라는 문자열을 리턴한다.<br><br>
+- 우리는 테스트 할 때 `mockSampleService`를 사용하므로 테스트를 돌리면 `helloMoonOf!`가 아닌 `hello js`가 된다.
+```java
+package com.sm.sample;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
+
+@RunWith(SpringRunner.class)
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
+public class sampleControllerTest {
+
+    @Autowired
+    TestRestTemplate testRestTemplate;
+
+    @MockBean
+    SampleService sampleService;
+
+    @Test
+    public void hello() throws Exception {
+        when(sampleService.getName()).thenReturn("js");
+        String result = testRestTemplate.getForObject("/hello", String.class);
+        assertThat(result).isEqualTo("hellojs");
+    }
+}
+```
+즉, `SampleController`가 사용하는 `SampleService`를 `mocking`해서 `Bean`을 `mockSampleService`로 교체한 것이다.
+<br><br>
+#### WebTestClient
+- `webClient`는 `Rest client` 중에 하나이다.<br><br>
+기존에 사용하던 `Rest client`는 `synchronous`(동기)이다. 즉, 요청 하나 보내고 , 끝날 때까지 기다린 후 요청을 보낼 수 있는데, <br>
+`webClient`는 `asynchronous`(비동기)이다. 요청을 보내고, 기다리지 않고, 응답이 오면 `call back`이 오는데,<br>
+그 때 `call back`을 실행할 수 있는 것이다.<br><br>
+`WebTestClient`는 테스트 할 때, 이런 `WebClient`와 비슷한 `API`를 사용할 수 있다.<br><br>
+`WebClient`를 사용하려면 `spring web flux`의존성이 들어와있어야한다.
+```xml
+       <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+```
+- 테스트를 작성해준다. `get().uri().exchange()`로 `get` 요청을 보내고, `status`와 `body`를 체크해준다.<br><br>
+```java
+package com.sm.sample;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.reactive.server.WebTestClient;
+
+import static org.mockito.Mockito.when;
+
+
+@RunWith(SpringRunner.class)
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
+public class sampleControllerTest {
+    @Autowired
+    WebTestClient webTestClient;
+
+    @MockBean
+    SampleService sampleService;
+
+    @Test
+    public void hello() throws Exception{
+        when(sampleService.getName()).thenReturn("js");
+        webTestClient.get().uri("/hello").exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class).isEqualTo("hellojs");
+    }
+
+}
+```
+### 슬라이스 테스트
+- 테스트는 모든 `Bean`을 등록한다. 그래서 테스트 할 `Bean`만 등록하고 싶을 때 사용하는 것이 슬라이스 테스트이다.<br><br>
+레이어 별로 잘라서 적용한다.<br><br>
+`@WebMvcTest` 어노테이션으로 테스트 해 볼 수 있다. `@WebMvcTest`어노테이션은 클래스를 특정해서 테스트 할 수 있다.<br><br>
+그리고 웹 레이어(`@Controller`,`ControllerAdvice`,`@JasonComponent`,`Converter`, `GenericConventer`, `Filter`,`WebMvcConfigurer`, `HandlerMethodArgumentResolver`)만 `Bean`으로 등록해준다는 특징이 있다.<br><br>
+
+`@Service`, `@Repository` 같은 `Bean`들은 `Bean`으로 등록해주지 않는다.<br><br>
+
+따라서, 테스트 시 의존성이 깨지기 때문에 위의 방법처럼 `@MockBean`으로 받아와서 사용한다.
+<br><br>
+테스트시 , `MockMvc`를 사용한다.<br><br>
+```java
+package com.sm.sample;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.mockito.Mockito.when;
+
+
+@RunWith(SpringRunner.class)
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@WebMvcTest(sampleController.class)
+public class sampleControllerTest2 {
+
+    @Autowired
+    MockMvc mockMvc;
+
+    @MockBean
+    SampleService sampleService;
+
+    @Test
+    public void hello() throws Exception{
+        when(sampleService.getName()).thenReturn("js");
+
+        mockMvc.perform(get("/hello"))
+                .andExpect(content().string("hello js"));
+    }
+
+}
+```
+- 이렇게 하면, SampleController 하나만 Bean으로 등록되어, 훨씬 가벼운 테스트가 된다.<br><br>
+`@WebMvcTest`말고도, `@JsonTest`,`@WebFluxTest`,`@DataJpaTest`등도 슬라이스 테스트 방법이다.<br><br>
+
+### OutputCaptureRule
+- junit의 Rule을 확장해서 만든것이다.<br><br>
+로그를 비롯한 console에 찍히는 모든 것을 캡처한다.<br><br>
+SampleController에 로거를 만들어 logger를 찍었을 때,
+```java
+package com.sm.sample;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class sampleController {
+
+    Logger logger = LoggerFactory.getLogger(sampleController.class)
+    @Autowired
+    private SampleService sampleService;
+
+    @GetMapping("/hello")
+    public String hello() {
+        logger.info("sangmoon");
+
+        return "hello" + sampleService.getName();
+    }
+
+}
+```
+- 테스트 클래스에서 `OutputCaptureRule`을 선언해서 (꼭 `public`으로 해야한다.) 테스트 해볼 수 있다.<br><br>
+```java
+package com.sm.sample;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.system.OutputCaptureRule;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.mockito.Mockito.when;
+
+
+@RunWith(SpringRunner.class)
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@WebMvcTest(sampleController.class)
+public class sampleControllerTest2 {
+
+    @Rule
+    public OutputCaptureRule outputCaptureRule = new OutputCaptureRule();
+
+    @Autowired
+    MockMvc mockMvc;
+
+    @MockBean
+    SampleService sampleService;
+
+    @Test
+    public void hello() throws Exception{
+        when(sampleService.getName()).thenReturn("js");
+
+        mockMvc.perform(get("/hello"))
+                .andExpect(content().string("hello js"));
+
+        assertThat(outputCaptureRule.toString()).contains("sangmoon");
+    }
+
+}
+```
