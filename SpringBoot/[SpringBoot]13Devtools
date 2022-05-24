@@ -1,0 +1,27 @@
+#[SpringBoot]
+##Spring-Boot-Devtools
+###Spring-Boot-Devtools란?
+- 스프링 부트가 제공하는 `optional`한 `tool`이다.<br><br>
+기본적으로 적용되는 것은 아니다.<bR><br>
+`pom.xml`에 의존성 추가를 해줘야 한다.<br><br>
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-devtools</artifactId>
+</dependency>
+```
+`devtools`를 의존성 추가해주면, 기본적으로 제공되는 `properties`들이 바뀌는 것이 있다.<br>
+대표적으로 캐쉬와 관련된 항목들을 `false`로 바꿔준다.(그 외에도 여럿 있다.)
+
+### re-start
+- 코드가 바뀌면, 그때 그때 바로 스프링 어플리케이션이 재실행 된다.<br><br>
+스프링부트는 클래스로더를 2개 사용한다.<br><br>
+- `base classloader` : 라이브러리들, 우리가 바꾸지 않는 의존성을 읽어들이는 `class loader`<br><br>
+- `restart classloader` : 어플리케이션을 읽어들이는 클래스 로더
+- `restart classloader` 를 사용하여 , 어플리케이션을 실행 후, 코드 수정하고 빌드만 해주면, 서버가 재시작 된다.<br><br>
+이것이 `restart`기능이다.<br><br>
+브라우저까지 자동으로 바뀌는 것은 `live reload`기능이다. (브라우저 플러그인 설치시에 작동)
+
+### 글로벌 프로퍼티
+- `spring dev tools`를 쓰는 경우, 프로퍼티 우선순위 중에 가장 높은 우선순위를 가지고 있다.<br>
+`~/.spring-boot-devtools.properties`
