@@ -1,0 +1,41 @@
+# [SpringBoot]
+
+## ViewResolver
+
+### ContentNegotiatingViewResolver
+
+- `ViewResolver` 중의 하나로, 들어오는 요청의 `accept header`(브라우저 또는 클라이언트가 어떠한 타입의 본문의 응답을 원한다고 서버에 알려주는 것)에 따라 응답이 달라진다.<br><br>
+  어떠한 요청이 들어오면 그 요청의 응답을 만들 수 있는 모든`view`를 찾아내고, 최종적으로 `accept header`의 `view`타입과 비교하여 선택한다.<br><br>
+  `accept header`가 없는 요청인 경우 `format`이라는 매개 변수를 사용한다.<br><br>
+
+### 예시
+
+(`User`와 `UserController` 코드는 이전 포스트와 동일)<br>
+`@Test` 파일을 만든다. `accepct header`를 `XML`로 준다.( 여기서 응답은 `json`으로 보내고 ,요청은 `xml`로 받길 바란다.)<br><br>
+
+```java
+class Sample {
+    MockMvc mockMvc;
+    @Test
+    public void createUser_XML() throws Exception {
+    String userJson = "{\"username\" : \"sanmgMoon\", \"password\" : \"1234\"}";
+    mockMvc.perform(post("/users/create") // 요청을 만드는 단계
+            .contentType(MediaType.APPLICATION_JSON_UTF8)
+            .accept(MediaType.APPLICATION_XML) // <<<<
+            .content(userJson))
+            //응답을 확인하는 단계
+            .andExpect(status().isOk())
+            .andExpect(xpath("/User/username").string("sangMoon")) // <<<<
+            .andExpect(xpath("/User/password").string("1234")); // <<<<
+    }
+}
+```
+- 만약 `error`가 발생한다면, `HttpMessageConverter`가 없기 때문이다. `pom.xml`에 아래의 의존성을 추가해주면 된다.<br><br>
+```XML
+<dependency>
+	<groupId>com.fasterxml.jackson.dataformat</groupId>
+	<artifactId>jackson-dataformat-xml</artifactId>
+	<version>2.9.6</version>
+</dependency>
+```
+테스트를 패스하는것을 볼 수 있다.
