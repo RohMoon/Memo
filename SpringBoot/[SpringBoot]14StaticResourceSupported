@@ -1,0 +1,34 @@
+#[SpringBoot]
+## Static Resources Supported
+
+### 정적 리소스
+- 우리가 서버에 어떤 작업을 처리해서 요청이 들어왔을 때, 뷰를 만들어 내는 것이 아니라,<br>
+웹 브라우저나 클라이언트에서 요청이 들어왔을 때, 그것에 대한 <b>리소스가 이미 만들어져 있고</b>,
+만들어져 있는 리소르를 그냥 보내주면 되는 것이다.<br><br>
+기본적으로 아래 위치에 있는 리소스들은 `/**`요청에 mapping되어 제공된다.
+
+- `classpath:/static`
+- `classpath:/public`
+- `classpath:/resources/`
+- `classpath:/META-INF/resources`
+
+### 예시
+- `resources`의 `static` 하위에 `hello.html`을 만들어준다.<br>
+![img_62.png](img_62.png)<br><Br>
+- 실행 후 `localhost:8080/hello.html`로 요청하면 응답이 제대로 오는 것을 볼 수 있다.<br><br>
+![img_63.png](img_63.png)<br><br>
+- 기본적으로 `url` 패턴은 `root`부터 설정되어 있다.<br><br> 만약 `mapping`을 변경하고 싶다면,<br>
+`application.properties`에서 `spring.mvc.static-path-pattern` 값을 변경해주면 된다.<br><br>
+![img_64.png](img_64.png)<br><Br>
+- ![img_65.png](img_65.png)<br><br>
+- 기존에 제공하는 `resource handler` 분만 아니라 새로 `resource handler`를 추가해 줄 수도 있다.<bR><br>
+- `src`-`main`-`java`에 `config` 패키지를 만들어 `WebConfig`클래스를 만들어 `WebMvcConfigurer`를 `implement`한다.<br><br>
+- 그 후, `addResourceHandler` 메서드를 `override`한다.<br><br>
+![img_66.png](img_66.png)<br><br>
+- 새로 `resource handler`를 추가해준다.<br><br>
+![img_67.png](img_67.png)
+- `m`이라는 요청으로 올 경우 `resource handler`로 추가해주는 거싱다.<br>
+- `classpath`아래에 `m` 디렉토리를 만들어주고 `hello.html`을 만들어준다.<br><br>
+- ![img_68.png](img_68.png)<br><br>
+![img_69.png](img_69.png)
+이렇게 새로 추가한 `resource handler`는 캐싱 전략을 따로 해줘야한다.
