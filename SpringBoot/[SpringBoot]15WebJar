@@ -1,0 +1,35 @@
+#[SpringBoot]
+## Web Jar
+### Web Jar란?
+- 클랑이언트에서 사용하는 `Reactjs`, `Angularjs`, `vuejs`, `jQuery`등을 JAR 파일로 스프링부트에 추가해 줄 수 있다.<br><br>
+그 `JAR`파일에 있는 `Css`나 `java script`를 참조할 수 있다.<br><br>
+- `pom.xml`에 의존성 추가해주면 사용할 수 있다.<br><br>
+- 스프링 부트는 웹 JAR의 기본 매핑을 제공한다. `/webjars/**`
+
+### 예시
+`jquery`를 추가해 보겠다.<bR><br>
+아래의 의존성을 `pom.xml`에 추가해준다.<br><br>
+```xml
+<dependency>
+    <groupId>org.webjars.bower</groupId>
+    <artifactId>jquery</artifactId>
+    <version>3.4.1</version>
+</dependency>
+```
+
+`/webjars/` 매핑으로 `jquery`를 추가해주고 `jquery`문법으로 `alert`를 띄울 수 있다.<bR><br>
+![img_70.png](img_70.png)<br><br>
+![img_71.png](img_71.png)<br><br>
+만약 버전 관리를 직접하기 싫다면, `Webjar Locator Core`를 추가해줘야 한다.<br><br>
+아래의 의존성을 추가해준다.<br><br>
+
+```xml
+<dependency>
+    <groupId>org.webjars</groupId>
+    <artifactId>webjars-locator-core</artifactId>
+    <version>0.43</version>
+</dependency>
+```
+그러면 `jquery`를 추가할 때, 버전을 안써도 된다.
+![img_72.png](img_72.png)<br><br>
+![img_73.png](img_73.png)
