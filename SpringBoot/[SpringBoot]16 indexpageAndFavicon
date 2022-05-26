@@ -1,0 +1,25 @@
+# [Spring Boot]
+## index 페이지 & 파비콘
+### index 페이지
+- `index` 페이지는 애플리케이션을 `root`로 요청했을 때의 페이지다.<br>
+즉, `localhost:8080`으로 호출햇을 때 처음 뜨는 페이지를 말한다.<br><br>
+2가지 방법으로 `index` 페이지를 생성할 수 있다.<br><br>
+
+### 정적 페이지로 생성하는 방법
+저번에 공부한 기본 리소스 위치 4가지 중, 아무곳이나 `index.html`파일을 만들어주면 된다.<br><br>
+그러면 자동으로 그 파일이 `index`페이지로 된다.<br><br>
+
+![img_74.png](img_74.png)<br><br>
+![img_75.png](img_75.png)<br><br>
+### 동적 페이지로 생성하는 방법
+- 동적 페이지로 생성하는 방법도 있는데 후에 템플릿 쓰는 법을 배울 때 해보자.
+
+### 파비콘
+아래의 아이콘 부분이 파비콘이다.<br>
+![img_76.png](img_76.png)<br><br>
+- 피파비콘을 바꿔보자<bR><br>
+- 먼저 `https://favicon.io/ `에 접속해, `Generate From Text`를 클릭하자.<br><br>
+- ![img_77.png](img_77.png)<br><br>
+- ![img_78.png](img_78.png)<br><br>
+- 다운 받아서 `resource`아래에 아무데나 두면 된다.<br>
+- ![img_79.png](img_79.png)
