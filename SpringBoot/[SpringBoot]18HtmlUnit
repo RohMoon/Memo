@@ -1,0 +1,54 @@
+#[Spring Boot]
+## HtmlUnit
+### HtmlUnit 이란?
+- `html`을 단일 테스트하기 위한 'tool'이다.<br><br>
+-` webClient`를 만들어서 사용한다.<bR>
+`HtmlPage`라는  인터페이스를 통해 `xml`,`text` 등 여러가지로 가져올 수 있다.<br><br>
+`form`이 있는 경우 `form`을 채워 `submit`하는 테스트도 진행해 볼 수 있다.<br><br>
+### 예제
+이전 `thymeleaf`에서 했던 테스트 예제를 `HtmlUnit`을 사용하여 테스트한다.<br><br>
+먼저 `HtmlUnit`을 사용하기 위한 의존성을 추가해준다.<bR><br>
+```xml
+<dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>htmlunit-driver</artifactId>
+    <scope>test</scope>
+</dependency>
+<dependency>
+<groupId>net.sourceforge.htmlunit</groupId>
+<artifactId>htmlunit</artifactId>
+<scope>test</scope>
+</dependency>
+```
+`MockMvc` 대신 `WebClient`를 주입받아 테스트 할 수 있다.
+```java
+@Runwith(SpringRunner.class)
+@WebMvcTest(SampleController.class)
+public class SampleControllerTest{
+    
+    @Autowired
+    WebClient webClient;
+    
+    @Test
+    public void hello() throws Exception{
+        HtmlPage page = webclient.getPage("/hello");
+        
+        HtmlHeading1 h1 = page.getFirstByXpath("//h1"); //본문 중 ,h1태그를 가져옴
+        
+        assertThat(h1.getTextContent()).isEqualToIgnoringCase("sangmoon");
+    }
+}
+```
+> XPath
+> - XPath(XML Path Language)는 `W3C`의 표준으로 확장 생성 언어 문서의 구조를 통해 경로 위에 지정한 구문을 사용하여 항목을 배치하고 처리하는 방법을 기술하는 언어이다.<br>
+> `XML` 표현보다 더 쉽고 약어로 되어 있으며, `XSL`변환과 `XML`지시자 언어에 쓰이는 언어이다. `XPath`는 `XML`문서의 노드를 정의하기 위하여 경로식을 사용하며, <br>
+> 수학 함수와 기타 확장 가능한 표현들이 있다.<br><br> 
+> 아래의 `XPath` 식은 <br>
+> `/wikimedia/projects/project/@name`<br>
+> 모든 `project ` 요소의 `name` 속성을 선택하고, <br><br>
+> 아래의 `XPath`식은 <br>
+> `/wikimedia/projects/editions/edition[@language="English"]/text()`
+> 모든 영문 'Wikimedia' 프로젝트의 주소 (`language` 속성이 `English`인 모든 `edition` 요소의 문자열)를 선택한다.
+> 아래의 `Xpath`식은 <bR>
+> `/wikimedia/projects/project[@name="Wikipedia"]/editions/edition/text()`
+> 모든 위키백과의 주소 (`Wikipedia`의 이름 특성을 가진 `project` 요소 아래에 존재하는 모든 `edition` 요소의 문자열)를 선택한다.
