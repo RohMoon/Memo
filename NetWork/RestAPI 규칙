@@ -1,0 +1,50 @@
+# REST란?
+- Representational State Transfer 의 약자
+- 자원(URI), 행위(HTTP Method), 표현(Representations)로 구성되어 있다.<br><br>
+## REST API 설계시 유의점
+- URI는 정보의 장원을 표현해야 한다.
+- 자원에 대한 행위는 GET,POST,PUT,DELETE 등 HTTP Method로 표현한다.<br><br>
+
+## REST API URI를 결정하는 몇가지 규칙
+1. 소문자를 사용한다.
+- 대문자는 때로 문제를 일으키는 경우가 있기 때문에 URI를 작성할 때는 소문자를 선호한다.
+- RFC3986은 채계 및 호스트 구성요소를 제외하고 URI를 대소문자를 구분하여 정의한다.<br><br>
+
+2. 언더바대신 하이픈을 사용한다.<br>
+- 가독성을 위해 긴 Path를 표현하는 단어는 하이픈으로 구분하는 것이 좋다.
+- 프로그램의 글자 폰트에 따라서 언더바 문자는 문자가 부분적으로 가려지거나 숨겨질수 있다.
+
+3. URI의 마지막에는 슬래시를 포함하지 않는다.
+- 후행 슬래시는 의미가 전혀 없고 혼란을 야기할 수 있다.
+- 많은 웹 구성 요소와 프레임 워크는 다음 두 URI를 동등하게 취급한다.
+- 그러나 URI 내의 모든 문자는 리소스의 고유 ID에 포함된다.<bR><br>
+두 개의 다른 URI는 두 개의 다른 리소스에 매핑된다.<br>
+  URI가 다르면 리소스도 다르고 그 반대도 마찬가지다. 그러므로 REST API는 명확한 URI를 생성해야 한다.<br>
+  
+## 계층관계를 나탈 때는 슬래시 구분자를 사용해야 한다.<Br>
+- 슬래시 문자는 URI의 경로 부분에서 자원 간의 계층적 관계를 나타내기 위해 사용한다.<br>
+- 행위는 포함하지 않는다.
+- 행위는 URL대신 Method를 사용하여 전달하낟.
+Bad - http://api.college.com/get-students<br>
+Good - http://api.college.com/students/
+  
+## 파일 확장자는 URI에 포함시키지 않는다.
+- 파일 확장자는 URI에 포함하지 말아야 한다.<br>
+대신에 CONTENT-Type 이라는 ㅔㅎ더를 통해 전달되는대로 미디어 타입을 사용하여 body의 콘텐츠를 처리하는 방법을 결정한다.<Br>
+  - Rest API 클라이언트는 HTTP 에서 제공하는 형식 선택 메커니즘인 Accept 요청 헤더를 권장해야한다.<Br>
+    - Bad - http://api.college.com/students/3248234/courses/2005/fall.json
+    - Good - http://api.college.com/students/3248234/courses/2005/fall
+    
+## 전달하고자 하는 자원의 명사를 사용하되, 컨트롤 자원을 의미하는 경우 예외적으로 동사를 허용한다.<br>
+Bad- http://api.college.com/course/writing
+Good - http://api.college.com/course/write
+
+## URI에 작성되는 영어를 복수형으로 작성한다.
+- 하나의 인스턴스를 복수형으로 표시하는게 영어 문법적으로 맞지 않겠다고 생각할 수도 있지만 URI의 형식을 복수형으로 사용하는 것이 실무에서 많이 사용되고 있다.
+- 관계가 다른 리소스 내에서만 존재할 경우 RESTFUL 원칙은 다음과 같은 지침을 제공한다.<br>
+  - http://api.college.com/students/3248234/courses
+  ID가 3248234인 학생이 학습한 모든 과정 목록 검색
+  - http://api.college.com/students/3248234/courses/physics
+  ID가 3248234인 학생을 위한 과정 물리학을 검색한다.<Br><Br>
+    
+## END포인트를 싣어보내준다.<br>

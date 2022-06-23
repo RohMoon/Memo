@@ -18,7 +18,7 @@
 
 ### AOP 주요 개념
 - #### Aspect
-  - 흩어진 관심사 (Crosscutting Concerns)를 묶어서 모듈화 한 것, 하나의 모듈, <b>Advice</b> <b>Ponit Cut</b>이 들어간다.
+  - 흩어진 관심사 (Crosscutting Concerns)를 묶어서 모듈화 한 것, 하나의 모듈, <b>Advice</b> <b>Point Cut</b>이 들어간다.
 - #### Target(누가)
   - `Aspect`가 가지고 있는 `Advice`가 적용되는 대상(클래스, 메서드 등등)을 말한다.
 - #### Advice(무엇을)

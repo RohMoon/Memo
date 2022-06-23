@@ -25,3 +25,4 @@
 ### 글로벌 프로퍼티
 - `spring dev tools`를 쓰는 경우, 프로퍼티 우선순위 중에 가장 높은 우선순위를 가지고 있다.<br>
 `~/.spring-boot-devtools.properties`
+
