@@ -20,3 +20,13 @@
 6. @Profile 어노테이션을 사용하여 특정 환경에서만 빈을 등록할 수 있습니다.
 7. AOP(Aspect-Oriented Programming) 관련 어노테이션들은 빈 등록 이후에 적용됩니다.
 8. 필터(Filter), 인터셉터(Interceptor) 등과 같은 웹 애플리케이션 관련 어노테이션들은 웹 서버 구동 이후에 적용됩니다.
+
+Spring에서 AOP, 필터, 인터셉터를 적용하는 순서는 다음과 같습니다.
+
+필터(Filter): 필터는 DispatcherServlet 이전에 실행되며, 요청에 대한 처리를 수행하기 전에 요청과 응답을 조작할 수 있습니다. 필터는 web.xml에 등록하거나 Spring Boot에서는 FilterRegistrationBean으로 등록합니다.
+
+인터셉터(Interceptor): 인터셉터는 DispatcherServlet이 Controller를 호출하기 전과 후에 요청과 응답을 가로채서 처리합니다. 인터셉터는 HandlerInterceptor 인터페이스를 구현하여 작성하며, Spring에서는 인터셉터를 등록할 수 있는 WebMvcConfigurerAdapter 또는 WebMvcConfigurer 인터페이스를 사용합니다.
+
+AOP(Aspect-Oriented Programming): AOP는 핵심 로직과 부가적인 관심사를 분리해서 프로그래밍하는 기법입니다. AOP는 스프링에서 AspectJ와 같은 라이브러리를 사용해서 구현할 수 있습니다. AOP는 Proxy를 사용하기 때문에, Target Object를 감싸는 형태로 적용되며, 메소드 실행 전후 또는 예외 발생 시점에 특정 기능을 수행할 수 있습니다.
+
+위의 순서는 전체적인 순서이며, AOP, 필터, 인터셉터는 서로의 영향을 받지 않습니다. 다만, Spring에서 제공하는 Proxy 기반 AOP를 사용할 경우, Bean 객체의 메소드 호출을 Proxy 객체가 감싸게 되는데, 이때 필터와 인터셉터는 Proxy 객체를 대상으로 처리됩니다. 따라서 AOP는 필터와 인터셉터보다 먼저 실행되지만, Proxy 객체에 대한 메소드 호출을 가로채기 때문에 필터와 인터셉터의 처리를 막을 수 있습니다.
