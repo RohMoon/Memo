@@ -30,3 +30,31 @@ Spring에서 AOP, 필터, 인터셉터를 적용하는 순서는 다음과 같�
 AOP(Aspect-Oriented Programming): AOP는 핵심 로직과 부가적인 관심사를 분리해서 프로그래밍하는 기법입니다. AOP는 스프링에서 AspectJ와 같은 라이브러리를 사용해서 구현할 수 있습니다. AOP는 Proxy를 사용하기 때문에, Target Object를 감싸는 형태로 적용되며, 메소드 실행 전후 또는 예외 발생 시점에 특정 기능을 수행할 수 있습니다.
 
 위의 순서는 전체적인 순서이며, AOP, 필터, 인터셉터는 서로의 영향을 받지 않습니다. 다만, Spring에서 제공하는 Proxy 기반 AOP를 사용할 경우, Bean 객체의 메소드 호출을 Proxy 객체가 감싸게 되는데, 이때 필터와 인터셉터는 Proxy 객체를 대상으로 처리됩니다. 따라서 AOP는 필터와 인터셉터보다 먼저 실행되지만, Proxy 객체에 대한 메소드 호출을 가로채기 때문에 필터와 인터셉터의 처리를 막을 수 있습니다.
+
+
+Spring Framework의 어플리케이션 컨텍스트는 크게 3가지 단계로 초기화됩니다.
+
+환경(Environment)의 로딩
+
+스프링 어플리케이션 컨텍스트는 Environment 객체를 생성하여 시스템 환경 변수, JVM 시스템 프로퍼티, application.properties 또는 application.yml 등의 설정 파일을 로딩합니다.
+빈(Bean) 정의의 로딩과 생성
+
+어플리케이션 컨텍스트는 BeanDefinitionReader를 사용하여 빈(Bean) 정의를 로딩하고, BeanFactory를 생성합니다.
+이때, 빈(Bean) 정의를 토대로 해당 빈(Bean)을 생성하진 않습니다.
+빈(Bean) 생성 및 초기화
+
+생성된 BeanFactory를 통해 빈(Bean)을 생성하고 초기화합니다.
+@PostConstruct나 InitializingBean 인터페이스를 구현한 메서드 등을 사용하여 빈(Bean)을 초기화할 수 있습니다.
+AOP, 필터, 인터셉터 등은 빈(Bean) 생성 후에 적용되는 기능입니다. 따라서, 어플리케이션 컨텍스트 초기화 이후에 AOP, 필터, 인터셉터가 적용됩니다. 그러나, 각각의 적용 순서는 다음과 같습니다.
+
+필터(Filter)
+
+서블릿 컨테이너에서 요청(Request)이 들어오면, 요청(Request)을 받는 첫 번째 단계에서 필터(Filter)가 적용됩니다.
+AOP(Aspect-Oriented Programming)
+
+AOP는 프록시를 이용하여 대상 메서드의 호출 전/후에 횡단 관심사(Cross-cutting Concerns)를 적용합니다.
+따라서, 프록시를 생성하기 위해 빈(Bean)이 필요합니다. 따라서, 빈(Bean) 생성 후에 AOP가 적용됩니다.
+인터셉터(Interceptor)
+
+인터셉터는 스프링 MVC에서 요청 처리 과정에서 컨트롤러(Controller)에 진입하기 전/후에 처리되는 기능입니다.
+따라서, 컨트롤러(Controller)에 진입하기 전/후에 적용되기 때문에, AOP와 마찬가지로 빈(Bean) 생성 후에 적용됩니다.
